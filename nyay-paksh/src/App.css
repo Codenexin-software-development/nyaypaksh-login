@@ -1,0 +1,610 @@
+/* Reset & Base Styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Poppins', sans-serif;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  min-height: 100vh;
+}
+
+.App {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Login Header */
+.login-header {
+  background: #123A55;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  padding: 1rem 0;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.login-nav {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.login-logo {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+/* Logo Image Styles */
+.logo-image {
+  width: 60px;
+  height: 60px;
+  object-fit: contain;
+  border-radius: 10px;
+}
+
+.logo-text-large h1 {
+  font-size: 24px;
+  color: #eceff2;
+  margin: 0;
+}
+
+.logo-text-large p {
+  font-size: 12px;
+  color: #f0d8d8;
+  margin: 0;
+}
+
+.donate-btn-nav {
+  background: linear-gradient(135deg, #E08A2E, #F2A65A);
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.3s ease;
+}
+
+.donate-btn-nav:hover {
+  background: linear-gradient(135deg, #d17a1e, #e8963a);
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(224, 138, 46, 0.2);
+}
+
+/* BJP Style Center Logo - Circular Border */
+.center-logo-bjp {
+  display: flex;
+  justify-content: center;
+   margin-bottom: -2rem;
+  text-align: center;
+}
+
+.logo-border {
+  width: 150px;
+  height: 150px;
+  border: 5px solid #0F3B5F;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: white;
+  box-shadow: 0 5px 20px rgba(15, 59, 95, 0.2);
+}
+
+.logo-circle {
+  width: 130px;
+  height: 130px;
+  border: 3px solid #E08A2E;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background: white;
+}
+
+.center-logo-image {
+  width: 110px;
+  height: 110px;
+  object-fit: contain;
+  padding: 10px;
+}
+
+/* BJP Style Login Card */
+.login-content {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+}
+
+.login-container-center {
+  width: 100%;
+  max-width: 450px;
+}
+
+.login-card-bjp {
+  background: white;
+  border-radius: 15px;
+  padding: 2.5rem;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  border: 2px solid #0F3B5F;
+}
+
+.login-card-header-bjp {
+  margin-bottom: 1.5rem;
+}
+
+.login-card-header-bjp h2 {
+  color: #0F3B5F;
+  font-size: 1.6rem;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+}
+
+.missed-call-number-bjp {
+  font-size: 2.8rem;
+  font-weight: bold;
+  color: #0F3B5F;
+  margin: 0.5rem 0;
+  letter-spacing: 1px;
+}
+
+.missed-call-text-bjp {
+  font-size: 1.1rem;
+  color: #666;
+  margin-top: 0.5rem;
+}
+
+.login-divider-bjp {
+  display: flex;
+  align-items: center;
+  margin: 1.5rem 0;
+  color: #666;
+}
+
+.login-divider-bjp::before,
+.login-divider-bjp::after {
+  content: '';
+  flex: 1;
+  border-bottom: 1px solid #ddd;
+}
+
+.login-divider-bjp span {
+  padding: 0 1rem;
+  font-weight: 600;
+  font-size: 14px;
+  color: #0F3B5F;
+}
+
+.login-form-container h3 {
+  color: #0F3B5F;
+  font-size: 1.1rem;
+  margin-bottom: 1rem;
+  text-align: center;
+  font-weight: 600;
+}
+
+.mobile-input-large-bjp {
+  display: flex;
+  border: 2px solid #0F3B5F;
+  border-radius: 8px;
+  overflow: hidden;
+  margin: 1rem 0;
+}
+
+.country-code-large-bjp {
+  background: #0F3B5F;
+  color: white;
+  padding: 1rem;
+  font-size: 1rem;
+  font-weight: bold;
+  min-width: 70px;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mobile-input-large-bjp input {
+  flex: 1;
+  border: none;
+  padding: 1rem;
+  font-size: 1rem;
+  outline: none;
+  font-family: 'Poppins', sans-serif;
+  background: #f8f9fa;
+}
+
+.send-otp-btn-bjp {
+  width: 100%;
+  background: #0F3B5F;
+  color: white;
+  border: none;
+  padding: 1rem;
+  font-size: 1.1rem;
+  font-weight: bold;
+  border-radius: 8px;
+  cursor: pointer;
+  margin: 1.5rem 0;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.send-otp-btn-bjp:hover {
+  background: #123A55;
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(15, 59, 95, 0.3);
+}
+
+.terms-check-bjp {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-top: 1.5rem;
+  text-align: left;
+  padding: 1rem;
+  background: #f8f9fa;
+  border-radius: 8px;
+  border-left: 4px solid #E08A2E;
+}
+
+.terms-check-bjp input {
+  margin-top: 3px;
+  cursor: pointer;
+  min-width: 18px;
+  height: 18px;
+}
+
+.terms-check-bjp label {
+  font-size: 12px;
+  color: #666;
+  line-height: 1.5;
+  cursor: pointer;
+}
+
+/* OTP Modal */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  padding: 1rem;
+}
+
+.modal-content {
+  background: white;
+  border-radius: 15px;
+  max-width: 400px;
+  width: 100%;
+  animation: modalSlide 0.3s ease;
+  border: 2px solid #0F3B5F;
+}
+
+@keyframes modalSlide {
+  from {
+    opacity: 0;
+    transform: translateY(-50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.modal-close {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: #666;
+}
+
+.modal-header {
+  padding: 2rem 2rem 1rem;
+  text-align: center;
+  border-bottom: 1px solid #eee;
+}
+
+.modal-logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 1rem;
+}
+
+.modal-logo-image {
+  width: 50px;
+  height: 50px;
+  object-fit: contain;
+  border-radius: 10px;
+}
+
+.modal-logo h3 {
+  font-size: 20px;
+  color: #0F3B5F;
+  margin: 0;
+}
+
+.modal-header h2 {
+  color: #0F3B5F;
+  margin: 1rem 0 0.5rem;
+  font-size: 1.5rem;
+}
+
+.modal-header p {
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.modal-header strong {
+  color: #0F3B5F;
+}
+
+.otp-inputs-large {
+  display: flex;
+  justify-content: center;
+  gap: 0.8rem;
+  margin: 2rem;
+}
+
+.otp-digit-large {
+  width: 50px;
+  height: 50px;
+  text-align: center;
+  font-size: 1.5rem;
+  border: 2px solid #0F3B5F;
+  border-radius: 8px;
+  background: #f8f9fa;
+  font-family: 'Poppins', sans-serif;
+  font-weight: bold;
+  color: #0F3B5F;
+}
+
+.otp-digit-large:focus {
+  border-color: #E08A2E;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(224, 138, 46, 0.1);
+}
+
+.verify-btn-large {
+  width: calc(100% - 4rem);
+  margin: 0 2rem 2rem;
+  background: #0F3B5F;
+  color: white;
+  border: none;
+  padding: 1rem;
+  font-size: 1rem;
+  font-weight: bold;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  transition: all 0.3s ease;
+}
+
+.verify-btn-large:hover {
+  background: #123A55;
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(15, 59, 95, 0.2);
+}
+
+.otp-footer {
+  padding: 0 2rem 2rem;
+  text-align: center;
+}
+
+.resend-btn {
+  background: none;
+  border: none;
+  color: #0F3B5F;
+  cursor: pointer;
+  text-decoration: underline;
+  font-size: 14px;
+  font-family: 'Poppins', sans-serif;
+}
+
+.otp-timer {
+  margin-top: 1rem;
+  color: #666;
+  font-size: 14px;
+}
+
+.timer {
+  color: #e53935;
+  font-weight: bold;
+}
+
+/* Simple Footer */
+.login-footer {
+  background: #0F3B5F;
+  color: white;
+  padding: 2rem;
+  text-align: center;
+}
+
+.footer-simple {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+.footer-contact-simple {
+  margin-bottom: 1.5rem;
+}
+
+.footer-contact-simple p {
+  margin: 0.5rem 0;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.footer-contact-simple i {
+  color: #E08A2E;
+  width: 20px;
+}
+
+.footer-copyright {
+  margin-top: 1rem;
+}
+
+.footer-copyright p {
+  font-size: 14px;
+  margin-bottom: 0.5rem;
+  opacity: 0.9;
+}
+
+.footer-links-simple {
+  margin-top: 1rem;
+}
+
+.footer-links-simple a {
+  color: #E08A2E;
+  text-decoration: none;
+  font-size: 13px;
+}
+
+.footer-links-simple a:hover {
+  text-decoration: underline;
+}
+
+.footer-links-simple span {
+  color: rgba(255, 255, 255, 0.5);
+  margin: 0 10px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .login-nav {
+    padding: 0 1rem;
+  }
+  
+  .login-content {
+    padding: 1rem;
+  }
+  
+  .login-card-bjp {
+    padding: 2rem;
+  }
+  
+  .logo-border {
+    width: 120px;
+    height: 120px;
+  }
+  
+  .logo-circle {
+    width: 100px;
+    height: 100px;
+  }
+  
+  .center-logo-image {
+    width: 85px;
+    height: 85px;
+  }
+  
+  .missed-call-number-bjp {
+    font-size: 2.2rem;
+  }
+  
+  .otp-inputs-large {
+    gap: 0.5rem;
+  }
+  
+  .otp-digit-large {
+    width: 45px;
+    height: 45px;
+    font-size: 1.2rem;
+  }
+  
+  /* Responsive Footer */
+  .footer-contact-simple p {
+    flex-direction: column;
+    gap: 5px;
+  }
+  
+  .footer-contact-simple i {
+    margin-right: 0;
+  }
+  
+  .footer-links-simple {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .footer-links-simple span {
+    display: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .login-card-bjp {
+    padding: 1.5rem;
+  }
+  
+  .logo-border {
+    width: 100px;
+    height: 100px;
+  }
+  
+  .logo-circle {
+    width: 85px;
+    height: 85px;
+  }
+  
+  .center-logo-image {
+    width: 70px;
+    height: 70px;
+  }
+  
+  .login-card-header-bjp h2 {
+    font-size: 1.4rem;
+  }
+  
+  .missed-call-number-bjp {
+    font-size: 1.8rem;
+  }
+  
+  .donate-btn-nav {
+    padding: 8px 16px;
+    font-size: 14px;
+  }
+  
+  .logo-image {
+    width: 50px;
+    height: 50px;
+  }
+  
+  .logo-text-large h1 {
+    font-size: 20px;
+  }
+}
