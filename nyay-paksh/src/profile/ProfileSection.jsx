@@ -176,7 +176,7 @@ const isValidEmail = (email) => {
       {/* BASIC INFO */}
       <Section title="Basic Information">
         <Field>
-          <label>Title</label>
+          <label>Title*</label>
   <input
     value={form.title}
     placeholder="Select gender to auto-fill"
