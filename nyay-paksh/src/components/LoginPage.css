@@ -615,6 +615,36 @@ body {
   }
   
   .logo-text-large h1 {
-    font-size: 20px;
+    font-size: 23px;
   }
 }
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+}
+
+.nav-links li {
+  list-style: none;
+}
+
+/* Button styled EXACTLY like nav links */
+.nav-link-btn {
+  background: none;
+  border: none;
+  color: #ffffff;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 0;
+  transition: opacity 0.2s ease;
+}
+
+.nav-links a:hover,
+.nav-link-btn:hover {
+  color: #f59e0b; 
+}
+

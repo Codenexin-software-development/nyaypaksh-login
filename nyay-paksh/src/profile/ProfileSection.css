@@ -1,0 +1,249 @@
+
+html, body {
+  margin: 0;
+  padding: 0;
+}
+
+.profile-page {
+  margin-top: 0;
+  padding-top: 0;
+}
+/* ===== PAGE ===== */
+.profile-page {
+
+  background: linear-gradient(180deg, #0f3b5f, #123a55);
+  padding-bottom: 0;
+}
+
+/* ===== HEADER ===== */
+.profile-header {
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+  
+  background: linear-gradient(180deg, #0f3b5f, #123a55);
+  padding: 28px 16px 80px;
+
+  color: white;
+}
+
+
+
+.profile-header-content {
+  max-width: 420px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.profile-header img {
+  height: 44px;
+  background: #eeecf0;
+  padding: 4px;
+  border-radius: 4px;
+}
+
+.profile-header h1 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.profile-header p {
+  margin: 4px 0 0;
+  font-size: 13px;
+  opacity: 0.9;
+}
+
+/* ===== CARD ===== */
+.profile-card {
+  max-width: 420px;
+  margin: -48px auto 0;
+  background: #e6e0ed;
+  border-radius: 16px;
+  padding: 64px 18px 20px;
+  box-shadow: 0 12px 32px rgba(15, 59, 95, 0.25);
+  position: relative;
+}
+
+/* ===== AVATAR (FIXED & CORRECT) ===== */
+.avatar-float {
+  margin-top: -56px; /* pulls avatar over header */
+  display: flex;
+  justify-content: center;
+  z-index: 5;
+}
+.avatar-container {
+  position: absolute;
+  top: -26px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.avatar-circle {
+  width: 112px;
+  height: 112px;
+  border-radius: 50%;
+  background: #ffffff;
+  border: 3px solid #2f3439;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+}
+
+.avatar-svg {
+  width: 56px;
+  height: 56px;
+  fill: #2f3439;
+}
+
+
+
+
+/* ===== SECTIONS ===== */
+.section {
+  padding-top: 12px;
+  border-top: 1px solid #e5e7eb;
+}
+
+.section-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: #0f3b5f;
+  margin: 20px 0 10px;
+}
+
+/* ===== FORM ===== */
+.form-group {
+  margin-bottom: 14px;
+}
+
+label {
+  font-size: 13px;
+  margin-bottom: 6px;
+  display: block;
+}
+
+input,
+select {
+  width: 100%;
+  padding: 12px 14px;
+  background: #f9fafb;
+  border: 1px solid #d1d5db;
+  border-radius: 12px;
+}
+
+input:focus,
+select:focus {
+  outline: none;
+  border-color: #0f3b5f;
+  box-shadow: 0 0 0 3px rgba(15, 59, 95, 0.18);
+}
+
+/* Errors */
+.input-error {
+  border-color: #e53935 !important;
+  background: #fff5f5;
+}
+
+.error-text {
+  margin-top: 4px;
+  font-size: 12px;
+  color: #e53935;
+}
+
+/* ===== GENDER ===== */
+.gender-group {
+  display: flex;
+  gap: 10px;
+}
+
+.gender-pill {
+  flex: 1;
+  padding: 12px 0;
+  border-radius: 999px;
+  border: 1.5px solid #ccc;
+  background: #ffffff;
+  cursor: pointer;
+}
+
+.gender-pill.active {
+  background: #0f3b5f;
+  color: #ffffff;
+  border-color: #0f3b5f;
+}
+
+/* ===== PHONE ===== */
+.phone-input {
+  display: flex;
+  align-items: center;
+  gap: inherit;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid #d1d5db;
+  background: #f9fafb;
+}
+
+.phone-input:focus-within {
+  border-color: #0f3b5f;
+  box-shadow: 0 0 0 3px rgba(15, 59, 95, 0.18);
+}
+
+.phone-input select,
+.phone-input input {
+  border: none;
+  background: transparent;
+  outline: none;
+}
+
+/* ===== CONSENT ===== */
+.consent-box {
+  display: flex;
+  gap: 10px;
+  font-size: 13px;
+  margin-top: 12px;
+}
+
+.consent-box input {
+  width: 16px;
+  height: 16px;
+  accent-color: #0f3b5f;
+}
+
+/* ===== CTA ===== */
+.save-btn {
+  width: 100%;
+  margin-top: 20px;
+  padding: 14px;
+  background: #0f3b5f;
+  color: #ffffff;
+  border: none;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.save-btn:hover:not(:disabled) {
+  background: #123a55;
+}
+
+.save-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ===== REMOVE NUMBER ARROWS ===== */
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+input[type="number"] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}

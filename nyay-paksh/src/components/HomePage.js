@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import logo from '../logo.jpg';
 import './HomePage.css';
+import { useNavigate } from "react-router-dom";
 
 function HomePage() {
+  const navigate = useNavigate();   
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [formData, setFormData] = useState({
     mobile: '',
@@ -34,6 +36,7 @@ function HomePage() {
 
   return (
     <div className="home-page">
+      
       {/* Header */}
       <header>
         <nav>
@@ -46,12 +49,23 @@ function HomePage() {
             </div>
             
             <div className="nav-menu">
+              
               <ul className="nav-links">
                 <li><a href="#"><i className="fas fa-home"></i> Home</a></li>
                 <li><a href="#"><i className="fas fa-calendar-alt"></i> Events</a></li>
                 <li><a href="#"><i className="fas fa-newspaper"></i> News</a></li>
                 <li><a href="#"><i className="fas fa-users"></i> About Us</a></li>
                 <li><a href="#join-section"><i className="fas fa-handshake"></i> Join Us</a></li>
+                <li>
+  <button
+    className="nav-link-btn"
+    onClick={() => navigate("/profile")}
+  >
+    <i className="fas fa-user-circle"></i> Complete Profile
+  </button>
+</li>
+
+                
               </ul>
               
               <div className="nav-actions">
@@ -86,16 +100,21 @@ function HomePage() {
               <li><a href="#"><i className="fas fa-users"></i> About Us</a></li>
               <li><a href="#join-section"><i className="fas fa-handshake"></i> Join Us</a></li>
               <li><a href="#"><i className="fas fa-heart"></i> Donate</a></li>
+              
             </ul>
           </div>
         </nav>
-        
+        <div className="nav-actions">
+  <div className="language-selector"></div>
+        </div>
         {/* Hero Banner */}
         <div className="hero-banner">
           <div className="hero-content">
             <h2>Building a Just India for Everyone</h2>
             <p>Join the movement for equality, transparency, and progressive governance</p>
             <a href="#join-section" className="cta-button">Become a Member <i className="fas fa-arrow-right"></i></a>
+            
+   
           </div>
         </div>
       </header>
@@ -218,20 +237,21 @@ function HomePage() {
                     </select>
                   </div>
                   
-                  <div className="terms-agreement">
-                    <input 
-                      type="checkbox" 
-                      id="terms" 
-                      name="terms"
-                      checked={formData.terms}
-                      onChange={handleInputChange}
-                      required 
-                    />
-                    <label htmlFor="terms">
-                      I certify that the information provided is correct and I agree to the <a href="#">Terms & Conditions</a>
-                    </label>
-                  </div>
-                  
+               <div className="terms-row">
+  <input
+    type="checkbox"
+    id="terms"
+    name="terms"
+    checked={formData.terms}
+    onChange={handleInputChange}
+    required
+  />
+  <label htmlFor="terms">
+    I certify that the information provided is correct and I agree to the{" "}
+    <a href="#">Terms & Conditions</a>
+  </label>
+</div>
+
                   <button type="submit" className="submit-btn">
                     <i className="fas fa-paper-plane"></i> Send OTP & Continue
                   </button>
