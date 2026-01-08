@@ -1,0 +1,331 @@
+/* profile.css */
+
+/* ===== Reset & Basics ===== */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+  background-color: #f8f9fa;
+  color: #333;
+}
+
+.container {
+  max-width: 1100px;
+  margin: 2rem auto;
+  padding: 2rem;
+}
+
+/* ===== Navbar ===== */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #003366;
+  padding: 1rem 2rem;
+  color: white;
+}
+
+.navbar .logo {
+  font-weight: bold;
+  font-size: 1.5rem;
+}
+
+.navbar nav a {
+  color: white;
+  text-decoration: none;
+  margin-left: 1.5rem;
+  font-weight: 500;
+  transition: 0.3s;
+}
+
+.navbar nav a:hover,
+.navbar nav a.active {
+  text-decoration: underline;
+}
+
+/* ===== Page Title ===== */
+.title {
+  text-align: center;
+  font-size: 2rem;
+  margin-bottom: 2rem;
+  color: #003366;
+}
+
+/* ===== Tabs ===== */
+.tabs {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 2rem;
+  gap: 1rem;
+}
+
+.tab {
+  padding: 0.5rem 1rem;
+  border: 1px solid #003366;
+  background-color: white;
+  color: #003366;
+  cursor: pointer;
+  border-radius: 5px;
+  font-weight: 500;
+  transition: all 0.3s;
+}
+
+.tab:hover {
+  background-color: #003366;
+  color: white;
+}
+
+.tab.active {
+  background-color: #003366;
+  color: white;
+}
+
+/* ===== Card ===== */
+.card {
+  background-color: white;
+  padding: 2rem;
+  border-radius: 10px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* ===== Profile Section ===== */
+.profile-section {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.avatar {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  cursor: pointer;
+  object-fit: cover;
+  border: 3px solid #003366;
+  margin-bottom: 0.5rem;
+}
+
+.profile-section p {
+  font-weight: 500;
+  color: #555;
+}
+
+/* ===== Form ===== */
+.form h3 {
+  color: #003366;
+  margin-bottom: 1rem;
+  text-align: left;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem 2rem;
+  margin-bottom: 1.5rem;
+}
+
+.row {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.form-group {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group label {
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="date"],
+select {
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  outline: none;
+  transition: 0.3s;
+}
+
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="date"]:focus,
+select:focus {
+  border-color: #003366;
+}
+
+/* Gender Selection */
+.gender {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.gender label {
+  padding: 0.5rem 1rem;
+  border: 1px solid #003366;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.gender label.selected,
+.gender label:hover {
+  background-color: #003366;
+  color: white;
+}
+
+/* ===== Buttons ===== */
+.btn {
+  padding: 0.6rem 1.5rem;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.3s;
+  margin-right: 1rem;
+  margin-top: 1rem;
+}
+
+.btn.primary {
+  background-color: #003366;
+  color: white;
+  border: none;
+}
+
+.btn.primary:hover {
+  background-color: #002244;
+}
+
+.btn.outline {
+  background-color: white;
+  color: #003366;
+  border: 1px solid #003366;
+}
+
+.btn.outline:hover {
+  background-color: #003366;
+  color: white;
+}
+
+.back-btn {
+  margin-top: 1.5rem;
+  display: block;
+  background-color: #555;
+  color: white;
+  border: none;
+}
+
+.back-btn:hover {
+  background-color: #333;
+}
+
+/* ===== Family Table ===== */
+.family-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+}
+
+.family-table th,
+.family-table td {
+  border: 1px solid #ccc;
+  padding: 0.5rem;
+  text-align: center;
+}
+
+.family-table th {
+  background-color: #003366;
+  color: white;
+}
+
+.family-table input,
+.family-table select {
+  width: 100%;
+  padding: 0.3rem;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+}
+
+/* ===== Social Input ===== */
+.social-input {
+  display: flex;
+  flex-direction: column;
+}
+
+.social-field {
+  display: flex;
+  align-items: center;
+}
+
+.social-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 35px;
+  margin-right: 0.5rem;
+}
+
+/* ===== Footer ===== */
+.login-footer {
+  margin-top: 2rem;
+  background-color: #003366;
+  color: white;
+  padding: 2rem;
+  border-radius: 0px;
+  text-align: center;
+}
+
+.footer-contact-simple p {
+  margin-bottom: 0.5rem;
+}
+
+.footer-links-simple a {
+  color: white;
+  text-decoration: none;
+}
+
+.footer-links-simple a:hover {
+  text-decoration: underline;
+}
+.login-footer {
+  width: 100%;
+  background-color: #003366;
+  color: white;
+  padding: 2rem;
+  text-align: center;
+  margin-top: 2rem;
+  border-radius: 0; /* remove rounded corners to span full width */
+}
+
+.footer-simple {
+  max-width: 1200px;
+  margin: 0 auto; /* centers content */
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.footer-contact-simple,
+.footer-copyright {
+  flex: 1;
+  min-width: 250px;
+  margin-bottom: 1rem;
+}
+
+.footer-links-simple a {
+  color: white;
+  text-decoration: none;
+}
+
+.footer-links-simple a:hover {
+  text-decoration: underline;
+}
+
