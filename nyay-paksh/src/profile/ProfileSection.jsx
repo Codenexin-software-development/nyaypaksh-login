@@ -57,36 +57,43 @@ const isValidEmail = (email) => {
   });
 
   /* ===== NAME VALIDATION ===== */
-  const isValidRealName = (name) => {
+ const isValidRealName = (name) => {
   if (!name) return false;
 
   const value = name.trim();
 
-  // Minimum length
+  // 1. Minimum length
   if (value.length < 3) return false;
 
-  // Only letters and single spaces between words
+  // 2. Only alphabets and single spaces
   if (!/^[A-Za-z]+(?:\s[A-Za-z]+)*$/.test(value)) return false;
 
-  // Reject names with repeated characters (e.g. aaa, xxx)
-  if (/^(.)\1+$/.test(value.replace(/\s/g, ""))) return false;
+  // 3. Reject repeated-character spam (aaaa, zzzz)
+  const compact = value.replace(/\s/g, "");
+  if (/^(.)\1{2,}$/.test(compact)) return false;
 
-  // Reject very common fake patterns
-  const lower = value.toLowerCase();
-  const fakePatterns = [
+  // 4. Reject keyboard patterns
+  const garbagePatterns = [
+    "asdf",
+    "qwer",
+    "zxcv",
     "test",
     "user",
-    "name",
     "demo",
     "admin",
     "abc",
-    "xyz",
+    "xyz"
   ];
 
-  if (fakePatterns.some((p) => lower.includes(p))) return false;
+  const lower = value.toLowerCase();
+  if (garbagePatterns.some(p => lower.includes(p))) return false;
+
+  // 5. Reject names with no vowel (ydyfdwdwdwhd)
+  if (!/[aeiou]/i.test(value)) return false;
 
   return true;
 };
+
 
 
   const handleSave = () => {
@@ -169,7 +176,14 @@ const isValidEmail = (email) => {
       {/* BASIC INFO */}
       <Section title="Basic Information">
         <Field>
-          <label>First Name</label>
+          <label>Title</label>
+  <input
+    value={form.title}
+    placeholder="Select gender to auto-fill"
+    readOnly
+    style={{ backgroundColor: "#f3f4f6", cursor: "not-allowed" }}
+  />
+          <label>First Name*</label>
           <input
             name="firstName"
             value={form.firstName}
@@ -193,7 +207,7 @@ const isValidEmail = (email) => {
         </Field>
 
         <Field>
-          <label>Last Name</label>
+          <label>Last Name*</label>
           <input
             name="lastName"
             value={form.lastName}
@@ -217,15 +231,27 @@ const isValidEmail = (email) => {
         </Field>
 
         <Field>
-          <label>Gender</label>
+          <label>Gender*</label>
           <div className="gender-group">
             {["Male", "Female", "Other"].map((g) => (
               <motion.button
                 key={g}
                 type="button"
                 className={`gender-pill ${form.gender === g ? "active" : ""}`}
-                onClick={() => setForm({ ...form, gender: g })}
-                whileTap={{ scale: 0.92 }}
+               onClick={() => {
+  let autoTitle = "";
+
+  if (g === "Male") autoTitle = "Mr.";
+  if (g === "Female") autoTitle = "Ms.";
+  if (g === "Other") autoTitle = "Mx.";
+
+  setForm({
+    ...form,
+    gender: g,
+    title: autoTitle,
+  });
+}}
+
               >
                 {g}
               </motion.button>
@@ -234,7 +260,7 @@ const isValidEmail = (email) => {
         </Field>
 
         <Field>
-          <label>Date of Birth</label>
+          <label>Date of Birth*</label>
           <input
             readOnly
             className="dob-trigger"
@@ -256,7 +282,7 @@ const isValidEmail = (email) => {
       {/* CONTACT INFO */}
       <Section title="Contact Information">
         <Field>
-          <label>Email</label>
+          <label>Email*</label>
          <input
   type="email"
   value={form.email}
@@ -278,7 +304,7 @@ const isValidEmail = (email) => {
         </Field>
         
 <Field>
-  <label>Mobile Number</label>
+  <label>Mobile Number*</label>
 
   <div className="phone-input">
     {/* Country selector */}
@@ -334,7 +360,7 @@ const isValidEmail = (email) => {
       {/* ADDRESS */}
       <Section title="Address Details">
         <Field>
-          <label>Address</label>
+          <label>Address*</label>
           <input
             name="address"
             value={form.address}
@@ -345,7 +371,7 @@ const isValidEmail = (email) => {
         </Field>
 
   <Field>
-  <label>State</label>
+  <label>State*</label>
   <select
     value={form.state}
     onChange={(e) => {
@@ -374,7 +400,7 @@ const isValidEmail = (email) => {
 
 
 <Field>
-  <label>District</label>
+  <label>District*</label>
   <select
     value={form.district}
     disabled={!districts.length}
@@ -403,7 +429,7 @@ const isValidEmail = (email) => {
 </Field>
 
      <Field>
-  <label>Pincode</label>
+  <label>Pincode*</label>
   <input
     type="number"
     value={form.pincode}

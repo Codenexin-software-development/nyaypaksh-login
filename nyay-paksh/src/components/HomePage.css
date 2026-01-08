@@ -86,13 +86,13 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  color: white;
+  color: rgb(245, 237, 237);
 }
 
 .language-selector select {
   background: transparent;
-  color: white;
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: rgb(218, 205, 205);
+  border: 1px solid rgb(238, 233, 233);
   padding: 0.5rem;
   border-radius: 4px;
   cursor: pointer;
