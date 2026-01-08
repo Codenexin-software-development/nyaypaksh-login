@@ -27,8 +27,9 @@ export default function ProfileSection() {
     pincode: "",
   });
   const [profileImage, setProfileImage] = useState(null);
-const fileInputRef = useRef(null);
-
+  const fileInputRef = useRef(null);
+  const cameraInputRef = useRef(null);
+  const [avatarSheetOpen, setAvatarSheetOpen] = useState(false);
   const [districts, setDistricts] = useState([]);
   const [dobOpen, setDobOpen] = useState(false);
   const [consent, setConsent] = useState(false);
@@ -119,6 +120,22 @@ const isValidEmail = (email) => {
 
     alert("Profile saved successfully!");
   };
+const handleImageSelect = (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+
+  if (!file.type.startsWith("image/")) {
+    alert("Please select a valid image");
+    return;
+  }
+
+  const reader = new FileReader();
+  reader.onloadend = () => {
+    setProfileImage(reader.result);
+    setAvatarSheetOpen(false);
+  };
+  reader.readAsDataURL(file);
+};
 
 
   return (
@@ -151,18 +168,78 @@ const isValidEmail = (email) => {
       >
 
         {/* ✅ AVATAR — THIS IS WHERE IT BELONGS */}
-        <div className="avatar-container">
-          <div className="avatar-circle">
-            <svg
-              className="avatar-svg"
-              viewBox="0 0 24 24"
-              aria-hidden="true"
-            >
-              <circle cx="12" cy="8" r="4" />
-              <path d="M4 20c0-4 4-6 8-6s8 2 8 6" />
-            </svg>
-          </div>
+        <div
+          className="avatar-circle"
+
+  onClick={() => setAvatarSheetOpen(true)}
+>
+  {profileImage ? (
+    <img src={profileImage} alt="Profile" />
+  ) : (
+    <svg viewBox="0 0 24 24" className="avatar-svg">
+      <circle cx="12" cy="8" r="4" />
+      <path d="M4 20c0-4 4-6 8-6s8 2 8 6" />
+    </svg>
+  )}
+</div>
+ <div className="avatar-upload-text">
+    <p className="avatar-title">Upload Profile Image</p>
+    <p className="avatar-subtitle">JPG, PNG • Max 2MB</p>
+  </div>
+
+<input
+  ref={fileInputRef}
+  type="file"
+  accept="image/*"
+  hidden
+  onChange={handleImageSelect}
+/>
+
+<input
+  ref={cameraInputRef}
+  type="file"
+  accept="image/*"
+  capture="environment"
+  hidden
+  onChange={handleImageSelect}
+/>
+
+{avatarSheetOpen && (
+  <div
+    className="avatar-sheet-backdrop"
+    onClick={() => setAvatarSheetOpen(false)}
+  >
+    <motion.div
+      className="avatar-sheet"
+      initial={{ y: "100%" }}
+      animate={{ y: 0 }}
+      transition={{ duration: 0.3 }}
+      onClick={(e) => e.stopPropagation()}
+    >
+      <div className="avatar-sheet-content">
+        <div className="upload-icon">☁️</div>
+        <h3>Select</h3>
+
+        <div className="avatar-actions">
+          <button onClick={() => cameraInputRef.current.click()}>
+            Camera
+          </button>
+          <button onClick={() => fileInputRef.current.click()}>
+            Gallery
+          </button>
         </div>
+
+        <button
+          className="cancel-btn"
+          onClick={() => setAvatarSheetOpen(false)}
+        >
+          Cancel
+        </button>
+      </div>
+    </motion.div>
+  </div>
+)}
+
 
         {/* ===== FORM STARTS HERE ===== */}
         {/* sections, fields, buttons */}
