@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import "./profile.css";
+import { Link, useNavigate } from "react-router-dom";
+import "./ProfileSection.css";
 
 function ProfilePage() {
   const navigate = useNavigate();
@@ -11,14 +11,41 @@ function ProfilePage() {
     "https://cdn-icons-png.flaticon.com/512/847/847969.png"
   );
 
-  const [familyMembers, setFamilyMembers] = useState([]);
-
-  const [socialDetails, setSocialDetails] = useState({
-    whatsapp: "",
-    facebook: "",
-    instagram: "",
-    twitter: "",
+  // Personal details state - updated with all fields
+  const [personalDetails, setPersonalDetails] = useState({
+    title: "",
+    fullName: "",
+    mobile: "",
+    dob: "",
+    caste: "",
+    education: "",
+    referredBy: "",
+    email: "",
+    category: "",
+    voterId: ""
   });
+
+  // Dropdown options
+  const titleOptions = ["Mr.", "Mrs.", "Ms.", "Dr.", "Prof."];
+  const educationOptions = [
+    "Select Qualification",
+    "High School",
+    "Intermediate/Diploma",
+    "Bachelor's Degree",
+    "Master's Degree",
+    "Doctorate/PhD",
+    "Other"
+  ];
+  const categoryOptions = [
+    "Select Category",
+    "General",
+    "OBC",
+    "SC",
+    "ST",
+    "Other"
+  ];
+
+  const [familyMembers, setFamilyMembers] = useState([]);
 
   const [contactDetails, setContactDetails] = useState({
     address: "",
@@ -29,480 +56,495 @@ function ProfilePage() {
     pc: "",
   });
 
-  // Profile image upload
+  const [socialDetails, setSocialDetails] = useState({
+    whatsapp: "",
+    facebook: "",
+    instagram: "",
+    twitter: "",
+  });
+
+  /* ---------------- IMAGE UPLOAD ---------------- */
   const handleImageChange = (e) => {
     const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = () => setProfileImage(reader.result);
-      reader.readAsDataURL(file);
-    }
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = () => setProfileImage(reader.result);
+    reader.readAsDataURL(file);
   };
 
+  /* ---------------- PERSONAL DETAILS HANDLERS ---------------- */
+  const handlePersonalChange = (field, value) => {
+    setPersonalDetails({
+      ...personalDetails,
+      [field]: value
+    });
+  };
+
+  /* ---------------- FAMILY ---------------- */
   const addFamilyMember = () => {
     setFamilyMembers([
       ...familyMembers,
-      { fullName: "", gender: "Male", relationship: "", mobile: "", dob: "" },
+      { name: "", gender: "Male", relation: "", mobile: "", dob: "" },
     ]);
   };
 
-  const updateFamilyMember = (index, field, value) => {
-    const updated = [...familyMembers];
-    updated[index][field] = value;
-    setFamilyMembers(updated);
+  const updateFamily = (i, key, value) => {
+    const copy = [...familyMembers];
+    copy[i][key] = value;
+    setFamilyMembers(copy);
   };
 
-  const removeFamilyMember = (index) => {
-    const updated = [...familyMembers];
-    updated.splice(index, 1);
-    setFamilyMembers(updated);
+  const removeFamily = (i) => {
+    const copy = [...familyMembers];
+    copy.splice(i, 1);
+    setFamilyMembers(copy);
   };
+
+  /* ---------------- CONTACT DETAILS HANDLERS ---------------- */
+  const handleContactChange = (field, value) => {
+    setContactDetails({
+      ...contactDetails,
+      [field]: value
+    });
+  };
+
+  /* ---------------- SOCIAL DETAILS HANDLERS ---------------- */
+  const handleSocialChange = (field, value) => {
+    setSocialDetails({
+      ...socialDetails,
+      [field]: value
+    });
+  };
+
+  /* ---------------- SAVE ---------------- */
+  const handleSave = () => {
+    // Combine all data
+    const profileData = {
+      personal: personalDetails,
+      family: familyMembers,
+      contact: contactDetails,
+      social: socialDetails,
+      gender,
+      profileImage
+    };
+    
+    console.log("Saving profile data:", profileData);
+    alert("Profile saved successfully ✅");
+  };
+
+  const handleSaveAndNext = () => {
+    handleSave();
+    const tabs = ["personal", "family", "contact", "social"];
+    const currentIndex = tabs.indexOf(activeTab);
+    if (currentIndex < tabs.length - 1) {
+      setActiveTab(tabs[currentIndex + 1]);
+    }
+  };
+
+  // Tab names as per screenshot
+  const tabs = [
+    { id: "personal", label: "Personal" },
+    { id: "family", label: "Family" },
+    { id: "contact", label: "Contact" },
+    { id: "social", label: "Social" }
+  ];
 
   return (
     <div className="page-container">
-      <div className="content-wrap">
-        {/* NAVBAR */}
-        <header className="navbar">
-          <div className="logo">NYAY PAKSH PARTY</div>
-          <nav>
-            <a href="#">Dashboard</a>
-            <a className="active" href="#">Profile</a>
-            <a href="#">Donations</a>
-            <a href="#">Refer a Member</a>
-            <a href="#">FAQ</a>
-          </nav>
-        </header>
+      {/* ---------------- COMPLETE PROFILE BANNER ---------------- */}
+      <div className="profile-banner">
+        <h2>Complete Your Profile</h2>
+        <p>Please provide accurate details to continue</p>
+      </div>
 
-        {/* MAIN CONTAINER */}
-        <div className="container">
-          <h2 className="title">UPDATE PROFILE</h2>
+      {/* ---------------- NAVBAR ---------------- */}
+      <header className="navbar">
+        <div className="logo">
+          <span className="logo-text">NYAY PAKSH</span>
+          <span className="logo-subtext">PARTY</span>
+        </div>
+        <nav>
+          <Link to="/dashboard" className="nav-link">Dashboard</Link>
+          <Link to="/profile" className="nav-link active">Profile</Link>
+          <Link to="/donations" className="nav-link">Donations</Link>
+          <Link to="/refer" className="nav-link">Refer a Member</Link>
+          <Link to="/faq" className="nav-link">FAQ</Link>
+        </nav>
+      </header>
 
-          {/* TABS */}
-          <div className="tabs">
-            {["personal", "family", "contact", "social"].map((tab) => (
-              <button
-                key={tab}
-                className={activeTab === tab ? "tab active" : "tab"}
-                onClick={() => setActiveTab(tab)}
-              >
-                {tab.charAt(0).toUpperCase() + tab.slice(1)}
-              </button>
-            ))}
-          </div>
+      {/* ---------------- CONTENT ---------------- */}
+      <div className="container">
+        <h2 className="title">UPDATE PROFILE</h2>
 
-          {/* CARD */}
-          <div className="card">
-            {/* PROFILE PHOTO */}
-            <div className="profile-section">
+        {/* TABS */}
+        <div className="tabs">
+          {tabs.map(tab => (
+            <button
+              key={tab.id}
+              className={`tab ${activeTab === tab.id ? "active" : ""}`}
+              onClick={() => setActiveTab(tab.id)}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+
+        <div className="card">
+          {/* PROFILE PHOTO SECTION */}
+          <div className="profile-section">
+            <h3 className="section-title">Profile Photo</h3>
+            <div className="avatar-container">
               <input
                 type="file"
-                id="profileUpload"
-                accept="image/png, image/jpeg, image/jpg"
-                style={{ display: "none" }}
+                id="upload"
+                hidden
+                accept="image/*"
                 onChange={handleImageChange}
               />
               <img
                 src={profileImage}
-                alt="User"
+                alt="Profile"
                 className="avatar"
-                onClick={() =>
-                  document.getElementById("profileUpload").click()
-                }
+                onClick={() => document.getElementById("upload").click()}
               />
-              <p>Profile Photo</p>
+              <p className="avatar-hint">Click to change photo</p>
             </div>
+          </div>
 
-            {/* PERSONAL DETAILS */}
-            {activeTab === "personal" && (
-              <form className="form">
-                <h3>PERSONAL DETAILS</h3>
-                <div className="grid">
-                  <select>
-                    <option>Title</option>
-                    <option>Mr.</option>
-                    <option>Ms.</option>
-                    <option>Mrs.</option>
-                  </select>
-
-                  <input
-                    type="text"
-                    placeholder="Full Name *"
-                    defaultValue="Mogili Pranathi"
-                  />
-
-                  {/* Gender Selection */}
-                  <div className="gender">
-                    {["Male", "Female", "Other"].map((g) => (
-                      <label
-                        key={g}
-                        className={gender === g ? "selected" : ""}
-                        onClick={() => setGender(g)}
-                      >
-                        {g}
-                      </label>
-                    ))}
-                  </div>
-
-                  <input type="email" placeholder="Email ID" />
-                  <input type="text" placeholder="Mobile Number" />
-                  <input type="date" />
-
-                  <select>
-                    <option>Religion</option>
-                    <option>Hindu</option>
-                    <option>Muslim</option>
-                    <option>Christian</option>
-                    <option>Sikh</option>
-                    <option>Other</option>
-                  </select>
-
-                  <select>
-                    <option>Category</option>
-                    <option>General</option>
-                    <option>SC</option>
-                    <option>ST</option>
-                    <option>OBC</option>
-                    <option>Minority</option>
-                  </select>
-
-                  <input type="text" placeholder="Caste" />
-
-                  <select>
-                    <option>Education Qualification</option>
-                    <option>B.Tech</option>
-                    <option>10th Pass</option>
-                    <option>12th Pass</option>
-                    <option>Graduate</option>
-                    <option>Post Graduate</option>
-                    <option>Diploma</option>
-                    <option>PhD & Above</option>
-                  </select>
-
-                  <select>
-                    <option>Profession</option>
-                    <option>Engineer</option>
-                    <option>Doctor</option>
-                    <option>Teacher</option>
-                    <option>Business</option>
-                    <option>Student</option>
-                    <option>Politician</option>
-                    <option>Other</option>
-                  </select>
-
-                  <input type="text" placeholder="Voter ID" />
-                  <input type="text" placeholder="Referred By (Membership Code)" />
-                </div>
-
-                <div className="actions">
-                  <button type="button" className="btn primary">
-                    Save
-                  </button>
-                  <button type="button" className="btn outline">
-                    Save & Next
-                  </button>
-                </div>
-              </form>
-            )}
-
-            {/* FAMILY DETAILS */}
-            {activeTab === "family" && (
+          {/* ---------------- PERSONAL DETAILS ---------------- */}
+          {activeTab === "personal" && (
+            <div className="form-section">
+              <h3 className="section-title">PERSONAL DETAILS</h3>
+              <p className="required-note">* Required fields</p>
+              
               <div className="form">
-                <h3>FAMILY DETAILS</h3>
-                <button type="button" className="btn primary" onClick={addFamilyMember}>
-                  Add Member +
+                {/* First Row: Title & Full Name */}
+                <div className="form-row">
+                  <div className="form-group">
+                    <label className="form-label required">Title</label>
+                    <select
+                      value={personalDetails.title}
+                      onChange={(e) => handlePersonalChange("title", e.target.value)}
+                      className="form-input"
+                    >
+                      <option value="">Select Title</option>
+                      {titleOptions.map(title => (
+                        <option key={title} value={title}>{title}</option>
+                      ))}
+                    </select>
+                  </div>
+                  
+                  <div className="form-group">
+                    <label className="form-label required">Full Name</label>
+                    <input 
+                      type="text"
+                      placeholder="Enter full name"
+                      value={personalDetails.fullName}
+                      onChange={(e) => handlePersonalChange("fullName", e.target.value)}
+                      className="form-input"
+                    />
+                  </div>
+                </div>
+
+                {/* Second Row: Mobile & Date of Birth */}
+                <div className="form-row">
+                  <div className="form-group">
+                    <label className="form-label required">Mobile Number</label>
+                    <input 
+                      type="tel"
+                      placeholder="Enter mobile number"
+                      value={personalDetails.mobile}
+                      onChange={(e) => handlePersonalChange("mobile", e.target.value)}
+                      className="form-input"
+                    />
+                  </div>
+                  
+                  <div className="form-group">
+                    <label className="form-label">Date of Birth</label>
+                    <input 
+                      type="date"
+                      value={personalDetails.dob}
+                      onChange={(e) => handlePersonalChange("dob", e.target.value)}
+                      className="form-input"
+                    />
+                  </div>
+                </div>
+
+                {/* Third Row: Caste & Education */}
+                <div className="form-row">
+                  <div className="form-group">
+                    <label className="form-label">Caste (optional)</label>
+                    <input 
+                      type="text"
+                      placeholder="Enter caste"
+                      value={personalDetails.caste}
+                      onChange={(e) => handlePersonalChange("caste", e.target.value)}
+                      className="form-input"
+                    />
+                  </div>
+                  
+                  <div className="form-group">
+                    <label className="form-label">Education Qualification</label>
+                    <select
+                      value={personalDetails.education}
+                      onChange={(e) => handlePersonalChange("education", e.target.value)}
+                      className="form-input"
+                    >
+                      {educationOptions.map(edu => (
+                        <option key={edu} value={edu}>{edu}</option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
+                {/* Fourth Row: Referred By */}
+                <div className="form-group">
+                  <label className="form-label">Referred By (Membership Code)</label>
+                  <input 
+                    type="text"
+                    placeholder="Enter referral code (optional)"
+                    value={personalDetails.referredBy}
+                    onChange={(e) => handlePersonalChange("referredBy", e.target.value)}
+                    className="form-input"
+                  />
+                </div>
+
+                {/* Divider */}
+                <hr className="form-divider" />
+
+                {/* Fifth Row: Gender & Email */}
+                <div className="form-row">
+                  <div className="form-group">
+                    <label className="form-label required">Gender</label>
+                    <div className="gender-options">
+                      {["Male", "Female", "Other"].map(g => (
+                        <button
+                          key={g}
+                          type="button"
+                          className={`gender-btn ${gender === g ? "active" : ""}`}
+                          onClick={() => setGender(g)}
+                        >
+                          {g}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  
+                  <div className="form-group">
+                    <label className="form-label">Email ID</label>
+                    <input 
+                      type="email"
+                      placeholder="Enter email address"
+                      value={personalDetails.email}
+                      onChange={(e) => handlePersonalChange("email", e.target.value)}
+                      className="form-input"
+                    />
+                  </div>
+                </div>
+
+                {/* Sixth Row: Category & Voter ID */}
+                <div className="form-row">
+                  <div className="form-group">
+                    <label className="form-label">Category</label>
+                    <select
+                      value={personalDetails.category}
+                      onChange={(e) => handlePersonalChange("category", e.target.value)}
+                      className="form-input"
+                    >
+                      {categoryOptions.map(cat => (
+                        <option key={cat} value={cat}>{cat}</option>
+                      ))}
+                    </select>
+                  </div>
+                  
+                  <div className="form-group">
+                    <label className="form-label">Voter ID</label>
+                    <input 
+                      type="text"
+                      placeholder="Enter voter ID number"
+                      value={personalDetails.voterId}
+                      onChange={(e) => handlePersonalChange("voterId", e.target.value)}
+                      className="form-input"
+                    />
+                  </div>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="actions">
+                  <button className="btn primary" onClick={handleSave}>
+                    Save Changes
+                  </button>
+                  <button className="btn secondary" onClick={handleSaveAndNext}>
+                    Save & Continue
+                  </button>
+                </div>
+
+                {/* Back Button */}
+                <button className="back-btn" onClick={() => navigate(-1)}>
+                  ← Back to Home
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* ---------------- FAMILY ---------------- */}
+          {activeTab === "family" && (
+            <div className="form-section">
+              <h3 className="section-title">FAMILY DETAILS</h3>
+              <div className="form">
+                <button className="btn add-btn" onClick={addFamilyMember}>
+                  + Add Family Member
                 </button>
 
-                <table className="family-table">
-                  <thead>
-                    <tr>
-                      <th>Full Name*</th>
-                      <th>Gender*</th>
-                      <th>Relationship*</th>
-                      <th>Mobile Number</th>
-                      <th>Date Of Birth*</th>
-                      <th>Action</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {familyMembers.length === 0 && (
-                      <tr>
-                        <td colSpan="6" style={{ textAlign: "center" }}>
-                          No family members added.
-                        </td>
-                      </tr>
-                    )}
-                    {familyMembers.map((member, index) => (
-                      <tr key={index}>
-                        <td>
-                          <input
-                            type="text"
-                            value={member.fullName}
-                            onChange={(e) =>
-                              updateFamilyMember(index, "fullName", e.target.value)
-                            }
-                          />
-                        </td>
-                        <td>
-                          <select
-                            value={member.gender}
-                            onChange={(e) =>
-                              updateFamilyMember(index, "gender", e.target.value)
-                            }
-                          >
-                            <option>Male</option>
-                            <option>Female</option>
-                            <option>Other</option>
-                          </select>
-                        </td>
-                        <td>
-                          <input
-                            type="text"
-                            value={member.relationship}
-                            onChange={(e) =>
-                              updateFamilyMember(index, "relationship", e.target.value)
-                            }
-                          />
-                        </td>
-                        <td>
-                          <input
-                            type="text"
-                            value={member.mobile}
-                            onChange={(e) =>
-                              updateFamilyMember(index, "mobile", e.target.value)
-                            }
-                          />
-                        </td>
-                        <td>
-                          <input
-                            type="date"
-                            value={member.dob}
-                            onChange={(e) =>
-                              updateFamilyMember(index, "dob", e.target.value)
-                            }
-                          />
-                        </td>
-                        <td>
-                          <button
-                            type="button"
-                            className="btn outline"
-                            onClick={() => removeFamilyMember(index)}
-                          >
-                            Delete
-                          </button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+                {familyMembers.map((member, index) => (
+                  <div key={index} className="family-member-card">
+                    <div className="family-row">
+                      <input 
+                        placeholder="Name" 
+                        value={member.name}
+                        onChange={e => updateFamily(index, "name", e.target.value)}
+                        className="form-input"
+                      />
+                      <input 
+                        placeholder="Relation" 
+                        value={member.relation}
+                        onChange={e => updateFamily(index, "relation", e.target.value)}
+                        className="form-input"
+                      />
+                      <input 
+                        placeholder="Mobile" 
+                        value={member.mobile}
+                        onChange={e => updateFamily(index, "mobile", e.target.value)}
+                        className="form-input"
+                      />
+                      <input 
+                        type="date" 
+                        value={member.dob}
+                        onChange={e => updateFamily(index, "dob", e.target.value)}
+                        className="form-input"
+                      />
+                      <button 
+                        className="remove-btn"
+                        onClick={() => removeFamily(index)}
+                        title="Remove member"
+                      >
+                        🗑
+                      </button>
+                    </div>
+                  </div>
+                ))}
 
                 <div className="actions">
-                  <button type="button" className="btn primary">
-                    Next
+                  <button className="btn primary" onClick={handleSave}>
+                    Save
+                  </button>
+                  <button className="btn secondary" onClick={handleSaveAndNext}>
+                    Save & Continue
                   </button>
                 </div>
               </div>
-            )}
+            </div>
+          )}
 
-            {/* CONTACT DETAILS */}
-            {activeTab === "contact" && (
-              <form className="form">
-                <h3>CONTACT DETAILS</h3>
-                <div className="row">
-                  <div className="form-group">
-                    <label>Address (House / Flat / Floor No.)</label>
-                    <input
-                      type="text"
-                      value={contactDetails.address}
-                      onChange={(e) =>
-                        setContactDetails({ ...contactDetails, address: e.target.value })
-                      }
-                    />
-                  </div>
-                  <div className="form-group">
-                    <label>Pincode*</label>
-                    <input
-                      type="text"
-                      value={contactDetails.pincode}
-                      onChange={(e) =>
-                        setContactDetails({ ...contactDetails, pincode: e.target.value })
-                      }
-                    />
-                  </div>
-                  <div className="form-group">
-                    <label>State*</label>
-                    <select
-                      value={contactDetails.state}
-                      onChange={(e) =>
-                        setContactDetails({ ...contactDetails, state: e.target.value })
-                      }
-                    >
-                      <option>Telangana</option>
-                      <option>Tamil Nadu</option>
-                      <option>Delhi</option>
-                      <option>Gao</option>
-                      <option>Haryana</option>
-                      <option>Kerala</option>
-                    </select>
-                  </div>
+          {/* ---------------- CONTACT ---------------- */}
+          {activeTab === "contact" && (
+            <div className="form-section">
+              <h3 className="section-title">CONTACT DETAILS</h3>
+              <div className="form">
+                <input
+                  placeholder="Address"
+                  value={contactDetails.address}
+                  onChange={e => handleContactChange("address", e.target.value)}
+                  className="form-input"
+                />
+                <div className="form-row">
+                  <input
+                    placeholder="Pincode"
+                    value={contactDetails.pincode}
+                    onChange={e => handleContactChange("pincode", e.target.value)}
+                    className="form-input"
+                  />
+                  <input
+                    placeholder="State"
+                    value={contactDetails.state}
+                    onChange={e => handleContactChange("state", e.target.value)}
+                    className="form-input"
+                  />
                 </div>
-
-                <div className="row">
-                  <div className="form-group">
-                    <label>District*</label>
-                    <select
-                      value={contactDetails.district}
-                      onChange={(e) =>
-                        setContactDetails({ ...contactDetails, district: e.target.value })
-                      }
-                    >
-                      <option value="">Select District</option>
-                      <option>Hyderabad</option>
-                      <option>Adilabad</option>
-                      <option>Karimnagar</option>
-                      <option>Medak</option>
-                      <option>Nalgonda</option>
-                      <option>Nizamabad</option>
-                    </select>
-                  </div>
-
-                  <div className="form-group">
-                    <label>Assembly constituency (AC)*</label>
-                    <select
-                      value={contactDetails.ac}
-                      onChange={(e) =>
-                        setContactDetails({ ...contactDetails, ac: e.target.value })
-                      }
-                    >
-                      <option value="">Select AC</option>
-                      <option>Karwan - 64</option>
-                    </select>
-                  </div>
-
-                  <div className="form-group">
-                    <label>Parliamentary constituency (PC)*</label>
-                    <select
-                      value={contactDetails.pc}
-                      onChange={(e) =>
-                        setContactDetails({ ...contactDetails, pc: e.target.value })
-                      }
-                    >
-                      <option value="">Select PC</option>
-                      <option>9 - Hyderabad</option>
-                      <option>8 - Secunderabad</option>
-                    </select>
-                  </div>
+                <div className="form-row">
+                  <input
+                    placeholder="District"
+                    value={contactDetails.district}
+                    onChange={e => handleContactChange("district", e.target.value)}
+                    className="form-input"
+                  />
+                  <input
+                    placeholder="Assembly Constituency (AC)"
+                    value={contactDetails.ac}
+                    onChange={e => handleContactChange("ac", e.target.value)}
+                    className="form-input"
+                  />
                 </div>
-              </form>
-            )}
+                <input
+                  placeholder="Parliamentary Constituency (PC)"
+                  value={contactDetails.pc}
+                  onChange={e => handleContactChange("pc", e.target.value)}
+                  className="form-input"
+                />
 
-            {/* SOCIAL DETAILS */}
-            {activeTab === "social" && (
-              <form className="form">
-                <h3>SOCIAL DETAILS</h3>
-                <div className="grid">
-                  <div className="form-group">
-                    <label>Whatsapp / Alternative number</label>
-                    <input
-                      type="text"
-                      placeholder="Enter WhatsApp number"
-                      value={socialDetails.whatsapp}
-                      onChange={(e) =>
-                        setSocialDetails({ ...socialDetails, whatsapp: e.target.value })
-                      }
-                    />
-                  </div>
-
-                  <div className="form-group social-input">
-                    <label>Facebook URL</label>
-                    <div className="social-field">
-                      <span className="social-icon">
-                        <img
-                          src="https://cdn-icons-png.flaticon.com/512/733/733547.png"
-                          alt="Facebook"
-                          width="20"
-                        />
-                      </span>
-                      <input
-                        type="text"
-                        placeholder="Enter Facebook URL"
-                        value={socialDetails.facebook}
-                        onChange={(e) =>
-                          setSocialDetails({ ...socialDetails, facebook: e.target.value })
-                        }
-                      />
-                    </div>
-                  </div>
-
-                  <div className="form-group social-input">
-                    <label>Instagram URL</label>
-                    <div className="social-field">
-                      <span className="social-icon">
-                        <img
-                          src="https://cdn-icons-png.flaticon.com/512/2111/2111463.png"
-                          alt="Instagram"
-                          width="20"
-                        />
-                      </span>
-                      <input
-                        type="text"
-                        placeholder="Enter Instagram URL"
-                        value={socialDetails.instagram}
-                        onChange={(e) =>
-                          setSocialDetails({ ...socialDetails, instagram: e.target.value })
-                        }
-                      />
-                    </div>
-                  </div>
-
-                  <div className="form-group social-input">
-                    <label>Twitter/X URL</label>
-                    <div className="social-field">
-                      <span className="social-icon">
-                        <img
-                          src="https://cdn-icons-png.flaticon.com/512/733/733579.png"
-                          alt="Twitter/X"
-                          width="20"
-                        />
-                      </span>
-                      <input
-                        type="text"
-                        placeholder="Enter Twitter/X URL"
-                        value={socialDetails.twitter}
-                        onChange={(e) =>
-                          setSocialDetails({ ...socialDetails, twitter: e.target.value })
-                        }
-                      />
-                    </div>
-                  </div>
+                <div className="actions">
+                  <button className="btn primary" onClick={handleSave}>
+                    Save
+                  </button>
+                  <button className="btn secondary" onClick={handleSaveAndNext}>
+                    Save & Continue
+                  </button>
                 </div>
-              </form>
-            )}
+              </div>
+            </div>
+          )}
 
-            <button className="back-btn" onClick={() => navigate("/home")}>
-              Back to Home
-            </button>
-          </div>
+          {/* ---------------- SOCIAL ---------------- */}
+          {activeTab === "social" && (
+            <div className="form-section">
+              <h3 className="section-title">SOCIAL MEDIA LINKS</h3>
+              <div className="form">
+                <input 
+                  placeholder="WhatsApp Number" 
+                  value={socialDetails.whatsapp}
+                  onChange={e => handleSocialChange("whatsapp", e.target.value)}
+                  className="form-input"
+                />
+                <input 
+                  placeholder="Facebook Profile URL" 
+                  value={socialDetails.facebook}
+                  onChange={e => handleSocialChange("facebook", e.target.value)}
+                  className="form-input"
+                />
+                <input 
+                  placeholder="Instagram Profile URL" 
+                  value={socialDetails.instagram}
+                  onChange={e => handleSocialChange("instagram", e.target.value)}
+                  className="form-input"
+                />
+                <input 
+                  placeholder="Twitter Profile URL" 
+                  value={socialDetails.twitter}
+                  onChange={e => handleSocialChange("twitter", e.target.value)}
+                  className="form-input"
+                />
+
+                <div className="actions">
+                  <button className="btn primary" onClick={handleSave}>
+                    Save Profile
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </div>
-
-      {/* FOOTER */}
-      <footer className="login-footer">
-        <div className="footer-simple">
-          <div className="footer-contact-simple">
-            <p>contact@nyaipaksh.org</p>
-            <p>📞 +91 11 1234 5678</p>
-            <p>📍 New Delhi, India</p>
-          </div>
-          <div className="footer-copyright">
-            <p>© 2026 Nyay Paksh Party. All Rights Reserved.</p>
-            <div className="footer-links-simple">
-              <a href="#">Privacy Policy</a>
-              <span> | </span>
-              <a href="#">Terms of Service</a>
-            </div>
-          </div>
-        </div>
-      </footer>
     </div>
   );
 }
