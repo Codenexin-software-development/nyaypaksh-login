@@ -1,620 +1,370 @@
-/* Reset & Base Styles */
+/* =========================
+   ENHANCED LOGIN PAGE CSS
+   (Font Size Corrected)
+========================= */
+
+/* =========================
+   CSS VARIABLES
+========================= */
+:root {
+  --primary-blue: #0f3b5f;
+  --secondary-blue: #123a55;
+  --accent-blue: #1e7bb6;
+  --primary-orange: #e08a2e;
+  --light-orange: #f2a65a;
+  --dark-orange: #c5761e;
+  --white: #ffffff;
+  --light-bg: #f7f9fc;
+  --gray-light: #e9ecef;
+  --gray-medium: #6c757d;
+  --gray-dark: #343a40;
+  --success: #28a745;
+  --danger: #dc3545;
+
+  --shadow-sm: 0 2px 8px rgba(0,0,0,0.08);
+  --shadow-md: 0 4px 20px rgba(0,0,0,0.12);
+  --shadow-lg: 0 8px 30px rgba(0,0,0,0.15);
+
+  --gradient-primary: linear-gradient(135deg, #0f3b5f 0%, #1e7bb6 100%);
+  --gradient-orange: linear-gradient(135deg, #e08a2e 0%, #f2a65a 100%);
+}
+
+/* =========================
+   GLOBAL RESET
+========================= */
 * {
+  box-sizing: border-box;
   margin: 0;
   padding: 0;
-  box-sizing: border-box;
 }
 
 body {
-  font-family: 'Poppins', sans-serif;
-  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-  min-height: 100vh;
+  font-family: 'Segoe UI', -apple-system, system-ui, sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
+  background: var(--light-bg);
+  color: var(--gray-dark);
 }
 
-.App {
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
+/* =========================
+   HEADER
+========================= */
+.party-header {
+  background: var(--gradient-primary);
+  color: var(--white);
+  padding: 0.8rem 1rem;
+  box-shadow: var(--shadow-md);
 }
 
-/* Login Header */
-.login-header {
-  background: white;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-  padding: 1rem 0;
-  position: sticky;
-  top: 0;
-  z-index: 1000;
-}
-
-.login-nav {
+.header-container {
   max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 2rem;
+  margin: auto;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
 }
 
-.login-logo {
+.header-logo-section {
   display: flex;
   align-items: center;
   gap: 1rem;
 }
 
-/* Logo Image Styles */
-.logo-image {
-  width: 60px;
-  height: 60px;
-  object-fit: contain;
-  border-radius: 10px;
-}
-
-.logo-text-large h1 {
-  font-size: 24px;
-  color: #0F3B5F;
-  margin: 0;
-}
-
-.logo-text-large p {
-  font-size: 12px;
-  color: #666;
-  margin: 0;
-}
-
-.donate-btn-nav {
-  background: linear-gradient(135deg, #E08A2E, #F2A65A);
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 5px;
-  font-weight: 600;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  transition: all 0.3s ease;
-}
-
-.donate-btn-nav:hover {
-  background: linear-gradient(135deg, #d17a1e, #e8963a);
-  transform: translateY(-2px);
-  box-shadow: 0 5px 15px rgba(224, 138, 46, 0.2);
-}
-
-/* Nyay Paksh Style Center Logo - Circular Border */
-.center-logo-nyaypaksh {
-  display: flex;
-  justify-content: center;
-  margin-bottom: -3rem;
-  text-align: center;
-}
-
-.logo-border {
-  width: 150px;
-  height: 150px;
-  border: 5px solid #0F3B5F;
+.header-logo {
+  width: 50px;
+  height: 50px;
   border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: white;
-  box-shadow: 0 5px 20px rgba(15, 59, 95, 0.2);
+  border: 2px solid #fff;
 }
 
-.logo-circle {
-  width: 130px;
-  height: 130px;
-  border: 3px solid #E08A2E;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-  background: white;
-}
-
-.center-logo-image {
-  width: 110px;
-  height: 110px;
-  object-fit: contain;
-  padding: 10px;
-}
-
-/* Nyay Paksh Style Login Card */
-.login-content {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 2rem;
-}
-
-.login-container-center {
-  width: 100%;
-  max-width: 450px;
-}
-
-.login-card-nyaypaksh {
-  background: white;
-  border-radius: 15px;
-  padding: 2.5rem;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-  text-align: center;
-  border: 2px solid #4c5e6c;
-}
-
-.login-card-header-nyaypaksh {
-  margin-bottom: 1.5rem;
-}
-
-.login-card-header-nyaypaksh h2 {
-  color: #0F3B5F;
+.header-title h1 {
   font-size: 1.6rem;
-  margin-bottom: 0.5rem;
-  font-weight: 600;
+  font-weight: 700;
 }
 
-.missed-call-number-nyaypaksh {
-  font-size: 2.8rem;
-  font-weight: bold;
-  color: #e6e9ec;
-  margin: 0.5rem 0;
-  letter-spacing: 1px;
-  padding: 0px;;
-  background-color: #0F3B5F;
-  margin: 1rem 0;
-  text-align: center;
-  min-width: 70px;
-  box-shadow: 0 5px 20px rgba(15, 59, 95, 0.2);
-  
-  
-  
-}
-
-.missed-call-text-nyaypaksh {
-  font-size: 1.1rem;
-  color: #666;
-  margin-top: 0.5rem;
-}
-
-.login-divider-nyaypaksh {
-  display: flex;
-  align-items: center;
-  margin: 1.5rem 0;
-  color: #666;
-}
-
-.login-divider-nyaypaksh::before,
-.login-divider-nyaypaksh::after {
-  content: '';
-  flex: 1;
-  border-bottom: 1px solid #ddd;
-}
-
-.login-divider-nyaypaksh span {
-  padding: 0 1rem;
-  font-weight: 600;
-  font-size: 14px;
-  color: #0F3B5F;
-  
-}
-
-.login-form-container h3 {
-  color: #8d9ca8;
-  font-size: 1.1rem;
-  margin-bottom: 1rem;
-  text-align: center;
-  font-weight: 600;
-}
-
-.mobile-input-large-nyaypaksh {
-  display: flex;
-  border: 2px solid #0F3B5F;
-  border-radius: 8px;
-  overflow: hidden;
-  margin: 1rem 0;
-}
-
-.country-code-large-nyaypaksh {
-  background: #0F3B5F;
-  color: white;
-  padding: 1rem;
-  font-size: 1rem;
-  font-weight: bold;
-  min-width: 70px;
-  text-align: center;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.mobile-input-large-nyaypaksh input {
-  flex: 1;
-  border: none;
-  padding: 1rem;
-  font-size: 1rem;
-  outline: none;
-  font-family: 'Poppins', sans-serif;
-  background: #f8f9fa;
-}
-
-.send-otp-btn-nyaypaksh {
-  width: 50%;
-  background: #0F3B5F;
-  color: white;
-  border: none;
-  padding: 1rem;
-  font-size: 1.1rem;
-  font-weight: bold;
-  border-radius: 8px;
-  cursor: pointer;
-  margin: 1.5rem 0;
-  transition: all 0.3s ease;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.send-otp-btn-nyaypaksh:hover {
-  background: #123A55;
-  transform: translateY(-2px);
-  box-shadow: 0 5px 15px rgba(15, 59, 95, 0.3);
-}
-
-.terms-check-nyaypaksh {
-  display: flex;
-  align-items: flex-start;
-  gap: 10px;
-  margin-top: 1.5rem;
-  text-align: left;
-  padding: 1rem;
-  background: #f8f9fa;
-  border-radius: 8px;
-  border-left: 4px solid #E08A2E;
-}
-
-.terms-check-nyaypaksh input {
-  margin-top: 3px;
-  cursor: pointer;
-  min-width: 18px;
-  height: 18px;
-}
-
-.terms-check-nyaypaksh label {
-  font-size: 12px;
-  color: #666;
-  line-height: 1.5;
-  cursor: pointer;
-}
-
-/* OTP Modal */
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.7);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 2000;
-  padding: 1rem;
-}
-
-.modal-content {
-  background: white;
-  border-radius: 15px;
-  max-width: 400px;
-  width: 100%;
-  animation: modalSlide 0.3s ease;
-  border: 2px solid #0F3B5F;
-}
-
-@keyframes modalSlide {
-  from {
-    opacity: 0;
-    transform: translateY(-50px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.modal-close {
-  position: absolute;
-  top: 1rem;
-  right: 1rem;
-  background: none;
-  border: none;
-  font-size: 1.5rem;
-  cursor: pointer;
-  color: #666;
-}
-
-.modal-header {
-  padding: 2rem 2rem 1rem;
-  text-align: center;
-  border-bottom: 1px solid #eee;
-}
-
-.modal-logo {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  margin-bottom: 1rem;
-}
-
-.modal-logo-image {
-  width: 50px;
-  height: 50px;
-  object-fit: contain;
-  border-radius: 10px;
-}
-
-.modal-logo h3 {
-  font-size: 20px;
-  color: #0F3B5F;
-  margin: 0;
-}
-
-.modal-header h2 {
-  color: #0F3B5F;
-  margin: 1rem 0 0.5rem;
-  font-size: 1.5rem;
-}
-
-.modal-header p {
-  color: rgb(102, 102, 102);
-  font-size: 0.9rem;
-}
-
-.modal-header strong {
-  color: #0F3B5F;
-}
-
-.otp-inputs-large {
-  display: flex;
-  justify-content: center;
-  gap: 0.8rem;
-  margin: 2rem;
-}
-
-.otp-digit-large {
-  width: 50px;
-  height: 50px;
-  text-align: center;
-  font-size: 1.5rem;
-  border: 2px solid #0F3B5F;
-  border-radius: 8px;
-  background: #f8f9fa;
-  font-family: 'Poppins', sans-serif;
-  font-weight: bold;
-  color: #0F3B5F;
-}
-
-.otp-digit-large:focus {
-  border-color: #E08A2E;
-  outline: none;
-  box-shadow: 0 0 0 3px rgba(224, 138, 46, 0.1);
-}
-
-.verify-btn-large {
-  width: calc(100% - 4rem);
-  margin: 0 2rem 2rem;
-  background: #0F3B5F;
-  color: white;
-  border: none;
-  padding: 1rem;
-  font-size: 1rem;
-  font-weight: bold;
-  border-radius: 8px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  transition: all 0.3s ease;
-}
-
-.verify-btn-large:hover {
-  background: #123A55;
-  transform: translateY(-2px);
-  box-shadow: 0 5px 15px rgba(15, 59, 95, 0.2);
-}
-
-.otp-footer {
-  padding: 0 2rem 2rem;
-  text-align: center;
-}
-
-.resend-btn {
-  background: none;
-  border: none;
-  color: #0F3B5F;
-  cursor: pointer;
-  text-decoration: underline;
-  font-size: 14px;
-  font-family: 'Poppins', sans-serif;
-}
-
-.otp-timer {
-  margin-top: 1rem;
-  color: #666;
-  font-size: 14px;
-}
-
-.timer {
-  color: #e53935;
-  font-weight: bold;
-}
-
-/* Simple Footer */
-.login-footer {
-  background: #0F3B5F;
-  color: white;
-  padding: 2rem;
-  text-align: center;
-}
-
-.footer-simple {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 2rem;
-}
-
-.footer-contact-simple {
-  margin-bottom: 1.5rem;
-}
-
-.footer-contact-simple p {
-  margin: 0.5rem 0;
-  font-size: 14px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-}
-
-.footer-contact-simple i {
-  color: #E08A2E;
-  width: 20px;
-}
-
-.footer-copyright {
-  margin-top: 1rem;
-}
-
-.footer-copyright p {
-  font-size: 14px;
-  margin-bottom: 0.5rem;
+.header-subtitle {
+  font-size: 0.85rem;
   opacity: 0.9;
 }
 
-.footer-links-simple {
-  margin-top: 1rem;
+.header-stats {
+  display: flex;
+  gap: 1rem;
 }
 
-.footer-links-simple a {
-  color: #E08A2E;
-  text-decoration: none;
-  font-size: 13px;
+.stat-item {
+  font-size: 0.85rem;
+  background: rgba(255,255,255,0.15);
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
 }
 
-.footer-links-simple a:hover {
-  text-decoration: underline;
+/* =========================
+   PAGE WRAPPER
+========================= */
+.page-wrapper {
+  min-height: calc(100vh - 160px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1rem;
+  background-size: cover;
+  background-position: center;
 }
 
-.footer-links-simple span {
-  color: rgba(255, 255, 255, 0.5);
-  margin: 0 10px;
+/* =========================
+   PROGRESS INDICATOR
+========================= */
+.progress-indicator {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
 }
 
-/* Responsive Design */
+.progress-step {
+  text-align: center;
+  font-size: 0.85rem;
+  opacity: 0.5;
+}
+
+.progress-step.active {
+  opacity: 1;
+}
+
+.step-circle {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: #fff;
+  color: var(--primary-blue);
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: auto;
+}
+
+.progress-step.active .step-circle {
+  background: var(--primary-orange);
+  color: #fff;
+}
+
+.progress-line {
+  width: 60px;
+  height: 2px;
+  background: #fff;
+  opacity: 0.4;
+}
+
+/* =========================
+   LOGIN CARD
+========================= */
+.login-card {
+  background: #fff;
+  width: 100%;
+  max-width: 620px;
+  padding: 2rem;
+  border-radius: 20px;
+  box-shadow: var(--shadow-lg);
+}
+
+.card-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.main-title {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--primary-blue);
+}
+
+.card-subtitle {
+  font-size: 0.95rem;
+  color: var(--gray-medium);
+}
+
+/* =========================
+   ERROR / SUCCESS
+========================= */
+.error-message {
+  font-size: 0.9rem;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  background: var(--danger);
+  color: #fff;
+}
+
+.error-message.success {
+  background: var(--success);
+}
+
+/* =========================
+   FORM
+========================= */
+.form-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.4rem;
+}
+
+.input-label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--primary-blue);
+  margin-bottom: 0.4rem;
+}
+
+.phone-input-wrapper {
+  display: flex;
+  border: 2px solid var(--gray-light);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.country-code {
+  padding: 0.8rem 1rem;
+  background: var(--gradient-primary);
+  color: #fff;
+  font-size: 0.95rem;
+}
+
+.phone-input-wrapper input {
+  border: none;
+  padding: 0.8rem;
+  font-size: 1rem;
+  width: 100%;
+  outline: none;
+}
+
+.input-hint {
+  font-size: 0.8rem;
+  color: var(--gray-medium);
+}
+
+/* =========================
+   FEATURES
+========================= */
+.features-list {
+  background: rgba(224,138,46,0.07);
+  padding: 1rem;
+  border-radius: 12px;
+}
+
+.feature-item {
+  font-size: 0.9rem;
+  margin-bottom: 0.4rem;
+}
+
+/* =========================
+   CONSENT
+========================= */
+.consent-label {
+  font-size: 0.85rem;
+  color: var(--gray-medium);
+}
+
+/* =========================
+   BUTTONS
+========================= */
+.submit-btn {
+  font-size: 1rem;
+  padding: 1rem;
+  border-radius: 12px;
+  border: none;
+  background: var(--gradient-orange);
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.verify-btn {
+  background: var(--gradient-primary);
+}
+
+.back-btn {
+  font-size: 0.9rem;
+  background: none;
+  border: none;
+  color: var(--gray-medium);
+  cursor: pointer;
+}
+
+/* =========================
+   OTP
+========================= */
+.otp-header h3 {
+  font-size: 1.2rem;
+}
+
+.otp-subtitle {
+  font-size: 0.9rem;
+}
+
+.otp-timer {
+  font-size: 0.85rem;
+  color: var(--primary-orange);
+}
+
+.otp-inputs-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 0.6rem;
+}
+
+.otp-digit {
+  font-size: 1.4rem;
+  font-weight: 700;
+  text-align: center;
+  border: 2px solid var(--gray-light);
+  border-radius: 10px;
+}
+
+/* =========================
+   FOOTER
+========================= */
+.login-footer {
+  background: var(--primary-blue);
+  color: #fff;
+  padding: 2rem 1rem 1rem;
+}
+
+.footer-section h4 {
+  font-size: 1rem;
+  margin-bottom: 0.8rem;
+  color: var(--light-orange);
+}
+
+.footer-section p,
+.footer-section a {
+  font-size: 0.85rem;
+  opacity: 0.9;
+}
+
+.footer-bottom {
+  text-align: center;
+  font-size: 0.8rem;
+  opacity: 0.8;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
 @media (max-width: 768px) {
-  .login-nav {
-    padding: 0 1rem;
-  }
-  
-  .login-content {
-    padding: 1rem;
-  }
-  
-  .login-card-nyaypaksh {
-    padding: 2rem;
-  }
-  
-  .logo-border {
-    width: 120px;
-    height: 120px;
-  }
-  
-  .logo-circle {
-    width: 100px;
-    height: 100px;
-  }
-  
-  .center-logo-image {
-    width: 85px;
-    height: 85px;
-  }
-  
-  .missed-call-number-nyaypaksh {
-    font-size: 2.2rem;
-  }
-  
-  .otp-inputs-large {
-    gap: 0.5rem;
-  }
-  
-  .otp-digit-large {
-    width: 45px;
-    height: 45px;
+  .main-title {
     font-size: 1.2rem;
   }
-  
-  /* Responsive Footer */
-  .footer-contact-simple p {
-    flex-direction: column;
-    gap: 5px;
-  }
-  
-  .footer-contact-simple i {
-    margin-right: 0;
-  }
-  
-  .footer-links-simple {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
-  
-  .footer-links-simple span {
-    display: none;
-  }
-}
 
-@media (max-width: 480px) {
-  .login-card-nyaypaksh {
-    padding: 1.5rem;
+  .submit-btn {
+    font-size: 0.95rem;
   }
-  
-  .logo-border {
-    width: 100px;
-    height: 100px;
-  }
-  
-  .logo-circle {
-    width: 85px;
-    height: 85px;
-  }
-  
-  .center-logo-image {
-    width: 70px;
-    height: 70px;
-  }
-  
-  .login-card-header-nyaypaksh h2 {
-    font-size: 1.4rem;
-  }
-  
-  .missed-call-number-nyaypaksh {
-    font-size: 1.8rem;
-  }
-  
-  .donate-btn-nav {
-    padding: 8px 16px;
-    font-size: 14px;
-  }
-  
-  .logo-image {
-    width: 50px;
-    height: 50px;
-  }
-  
-  .logo-text-large h1 {
-    font-size: 20px;
+
+  .otp-digit {
+    font-size: 1.2rem;
   }
 }
