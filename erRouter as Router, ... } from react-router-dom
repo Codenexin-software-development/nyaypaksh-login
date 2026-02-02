@@ -1,0 +1,43 @@
+[1mdiff --git a/nyay-paksh/src/App.js b/nyay-paksh/src/App.js[m
+[1mindex 6ce223b..a21a623 100644[m
+[1m--- a/nyay-paksh/src/App.js[m
+[1m+++ b/nyay-paksh/src/App.js[m
+[36m@@ -1,38 +1,19 @@[m
+[31m-[m
+ import React from "react";[m
+ import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";[m
+[31m-[m
+ import LoginPage from "./components/LoginPage";[m
+ import ProfilePage from "./components/ProfilePage";[m
+[31m-[m
+ import "./App.css";[m
+[31m-import React from 'react';[m
+[31m-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';[m
+[31m-import LoginPage from './components/LoginPage';[m
+[31m-import ProfilePage from "./components/ProfilePage";[m
+[31m-import './App.css';[m
+[31m-[m
+ [m
+ function App() {[m
+   return ([m
+     <Router>[m
+[31m-[m
+[31m-      <Routes>[m
+[31m-        <Route path="/" element={<Navigate to="/login" />} />[m
+[31m-        <Route path="/login" element={<LoginPage />} />[m
+[31m-        <Route path="/profile" element={<ProfilePage />} />[m
+[31m-      </Routes>[m
+[31m-[m
+       <div className="App">[m
+         <Routes>[m
+           <Route path="/" element={<Navigate to="/login" />} />[m
+           <Route path="/login" element={<LoginPage />} />[m
+[31m-          [m
+           <Route path="/profile" element={<ProfilePage />} />[m
+[31m-[m
+         </Routes>[m
+       </div>[m
+[31m-[m
+     </Router>[m
+   );[m
+ }[m
