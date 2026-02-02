@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useNavigate, Link, useLocation } from "react-router-dom";
-import "./LoginPage.css";
 import nppLogo from "../assets/npp.png";
+import backgroundImage from "../assets/nyay-party.jpeg";
 
 const LoginPage = ({ onLogin }) => {
   const navigate = useNavigate();
@@ -32,36 +32,18 @@ const LoginPage = ({ onLogin }) => {
     otpRefs.current = otpRefs.current.slice(0, 6);
   }, []);
 
-  // ═══════════════════════════════════════════════════════
-  // REGISTRATION SUCCESS MESSAGE (from /register via location.state)
-  // ═══════════════════════════════════════════════════════
+  // ─── Registration success message ───
   const [regMessage, setRegMessage] = useState("");
 
   useEffect(() => {
     if (location.state?.message) {
       setRegMessage(location.state.message);
-
-      // Auto-fill phone + email if register passed them
-      if (location.state.registeredPhone) {
-        setPhone(location.state.registeredPhone);
-      }
-      if (location.state.registeredEmail) {
-        setEmail(location.state.registeredEmail);
-        // If both are filled, jump straight to email stage
-        if (location.state.registeredPhone && location.state.registeredPhone.length === 10) {
-          setStage("email");
-        }
-      }
-
-      // Auto-dismiss banner after 5 s
       const timer = setTimeout(() => setRegMessage(""), 5000);
       return () => clearTimeout(timer);
     }
   }, [location]);
 
-  // ═══════════════════════════════════════════════════════
-  // VALIDATION
-  // ═══════════════════════════════════════════════════════
+  // ─── Validation ───
   const isValidEmail = useCallback(
     (val) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val),
     []
@@ -225,6 +207,11 @@ const LoginPage = ({ onLogin }) => {
   const handleMainAction = () => {
     // ── email stage → send OTP ──
     if (stage === "email") {
+      if (!isValidEmail(email)) {
+        setEmailError("कृपया एक सही ईमेल दर्ज करें।");
+        return;
+      }
+      
       setStage("otp");
       startTimers();
       showToast(`OTP ${email} पर भेजा गया।`);
@@ -244,68 +231,70 @@ const LoginPage = ({ onLogin }) => {
       setTimeout(() => {
         setIsTimerActive(false);
 
-        // ─── Read stored data ───
+        // For demo - accept any 6-digit OTP
+        const isValidOTP = otpCode.length === 6 && /^\d+$/.test(otpCode);
+        
+        if (!isValidOTP) {
+          showToast("❌ अमान्य OTP। कृपया सही OTP दर्ज करें।");
+          setIsVerifying(false);
+          return;
+        }
+
+        // Check if user exists in localStorage
         const storedUser = localStorage.getItem("nyaypaksh_user");
-        const storedProfile = localStorage.getItem("nyaypaksh_profile");
         let userData;
 
         if (storedUser) {
-          // Returning user — verify phone & email match
+          // Returning user
           userData = JSON.parse(storedUser);
-          if (userData.phone !== phone || userData.email !== email) {
-            showToast("❌ जानकारी मेल नहीं खाती। कृपया दोबारा दर्ज करें।");
-            setIsVerifying(false);
-            return;
-          }
         } else {
-          // Check temp user saved by RegisterPage
-          const tempUser = localStorage.getItem("nyaypaksh_temp_user");
-          if (tempUser) {
-            userData = JSON.parse(tempUser);
-            localStorage.removeItem("nyaypaksh_temp_user");
-          } else {
-            // Fallback: create new user object for demo
-            userData = {
-              id: `NPP${Date.now()}`,
-              phone: phone,
-              email: email,
-              fullName: "Member",
-              isRegistered: true,
-              registrationDate: new Date().toISOString(),
-            };
-          }
+          // New user - create demo account
+          userData = {
+            id: `NPP${Date.now()}`,
+            phone: phone,
+            email: email,
+            fullName: "Member",
+            isRegistered: true,
+            registrationDate: new Date().toISOString(),
+            membershipNumber: `NPP-M${Math.floor(100000 + Math.random() * 900000)}`,
+          };
         }
 
-        // ─── Persist authentication ───
+        // Update authentication state
         localStorage.setItem("nyaypaksh_user", JSON.stringify(userData));
         localStorage.setItem("nyaypaksh_authenticated", "true");
 
-        // ─── Notify parent App (updates its state) ───
-        if (onLogin) onLogin(userData);
+        // Notify parent App if callback exists
+        if (onLogin && typeof onLogin === 'function') {
+          onLogin(userData);
+        }
 
         showToast("✓ सफलतापूर्वक लॉगिन! आपका अकाउंट खुल गया।");
 
-        // ─── Smart redirect ───
+        // Smart redirect based on profile completion
         setTimeout(() => {
           setIsVerifying(false);
-          if (storedProfile) {
+          const hasProfile = localStorage.getItem("nyaypaksh_profile_complete") === "true";
+          if (hasProfile) {
             navigate("/dashboard", { replace: true });
           } else {
             navigate("/profile", { replace: true });
           }
-        }, 1500);
-      }, 1600);
+        }, 1000);
+      }, 1500);
     }
   };
 
   // ─── Enter key shortcut ───
   useEffect(() => {
     const handleKeyPress = (e) => {
-      if (e.key === "Enter" && !evaluateButtonState()) handleMainAction();
+      if (e.key === "Enter" && !evaluateButtonState()) {
+        handleMainAction();
+      }
     };
     document.addEventListener("keypress", handleKeyPress);
     return () => document.removeEventListener("keypress", handleKeyPress);
-  }, [stage, phone, email, otp, consent, isVerifying]);
+  });
 
   // ═══════════════════════════════════════════════════════
   // RENDER
@@ -333,10 +322,7 @@ const LoginPage = ({ onLogin }) => {
         </div>
       </nav>
 
-      {/* ─── BG ─── */}
-      <div className="bg-layer"></div>
-
-      {/* ─── MAIN ─── */}
+      {/* ─── MAIN CONTENT WITH BACKGROUND ─── */}
       <div className="main-content">
         <div className="modal-wrapper">
           <div className="card">
@@ -355,19 +341,7 @@ const LoginPage = ({ onLogin }) => {
 
             {/* ── Registration success banner ── */}
             {regMessage && (
-              <div style={{
-                background: "#edfbf0",
-                border: "1px solid #4caf50",
-                borderRadius: 8,
-                padding: "10px 14px",
-                marginBottom: 18,
-                display: "flex",
-                alignItems: "center",
-                gap: 8,
-                fontSize: 13,
-                color: "#2e7d32",
-                fontWeight: 500,
-              }}>
+              <div className="success-banner">
                 <span style={{ fontSize: 18 }}>✓</span>
                 <span>{regMessage}</span>
               </div>
@@ -400,13 +374,13 @@ const LoginPage = ({ onLogin }) => {
               className={`field-section ${stage === "email" || stage === "otp" ? "visible" : ""}`}
               id="emailSection"
             >
-              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+              <div className="email-header">
                 <label className="field-label">ईमेल पता</label>
                 {email && (
                   <button
                     onClick={clearEmailInput}
                     aria-label="Clear email"
-                    style={{ background: "none", border: "none", color: "#888", fontSize: 12, cursor: "pointer", padding: "2px 8px" }}
+                    className="clear-email-btn"
                   >
                     Clear
                   </button>
@@ -420,7 +394,7 @@ const LoginPage = ({ onLogin }) => {
                 onChange={handleEmailChange}
                 placeholder="आपका ईमेल दर्ज करें"
               />
-              <div className="email-error-msg">{emailError}</div>
+              {emailError && <div className="email-error-msg">{emailError}</div>}
             </div>
 
             {/* ──── OTP ──── */}
@@ -477,7 +451,7 @@ const LoginPage = ({ onLogin }) => {
                     </button>
                   </div>
                   {otpExpired && (
-                    <div style={{ textAlign: "center", color: "#e03a1e", fontSize: 13, marginTop: 10, fontWeight: 500 }}>
+                    <div className="otp-expired-msg">
                       OTP समाप्त हो गया। कृपया नया OTP प्राप्त करें।
                     </div>
                   )}
@@ -504,31 +478,36 @@ const LoginPage = ({ onLogin }) => {
               className="btn-otp"
               onClick={handleMainAction}
               disabled={evaluateButtonState()}
-              style={{ position: "relative", display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}
             >
-              {getButtonText()}
-              {(stage === "email" || stage === "otp") && !evaluateButtonState() && !isVerifying && (
-                <span style={{ fontSize: 12, opacity: 0.8 }}>(Enter ↵)</span>
+              {isVerifying ? (
+                <>
+                  <span className="spinner"></span>
+                  सत्यापित हो रहा है…
+                </>
+              ) : (
+                <>
+                  {getButtonText()}
+                  {(stage === "email" || stage === "otp") && !evaluateButtonState() && (
+                    <span className="enter-hint">(Enter ↵)</span>
+                  )}
+                </>
               )}
             </button>
 
             {/* ──── REGISTER LINK ──── */}
-            <div style={{ marginTop: 18, textAlign: "center", fontSize: 13, color: "#666" }}>
+            <div className="register-link">
               पहले से अकाउंट नहीं है?{" "}
-              <Link
-                to="/register"
-                style={{ color: "#e8611a", fontWeight: 600, textDecoration: "none", marginLeft: 4 }}
-              >
+              <Link to="/register" className="register-link-btn">
                 नया पंजीकरण करें
               </Link>
             </div>
 
             {/* ──── HELP ──── */}
-            <div style={{ marginTop: 14, textAlign: "center", fontSize: 12, color: "#666", padding: "0 10px" }}>
+            <div className="help-section">
               समस्या आ रही है?{" "}
               <button
                 onClick={() => alert("सहायता केंद्र: कृपया npp-help@example.com पर ईमेल करें या 1800-XXX-XXXX पर कॉल करें।")}
-                style={{ color: "#e8611a", background: "none", border: "none", cursor: "pointer", textDecoration: "underline", marginLeft: 4, fontSize: 12 }}
+                className="help-btn"
               >
                 सहायता केंद्र
               </button>
@@ -540,55 +519,96 @@ const LoginPage = ({ onLogin }) => {
       {/* ─── Toast ─── */}
       <div className="toast" id="toast"></div>
 
-      {/* ─── Loading Overlay (shown while verifying OTP) ─── */}
+      {/* ─── Loading Overlay ─── */}
       {isVerifying && (
-        <div style={{
-          position: "fixed",
-          inset: 0,
-          background: "rgba(0,0,0,0.55)",
-          zIndex: 9999,
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center",
-          color: "#fff",
-        }}>
-          <div style={{
-            width: 52,
-            height: 52,
-            border: "4px solid rgba(255,255,255,0.25)",
-            borderTop: "4px solid #e8611a",
-            borderRadius: "50%",
-            animation: "spin 0.8s linear infinite",
-            marginBottom: 18,
-          }}></div>
-          <p style={{ margin: 0, fontSize: 17, fontWeight: 600 }}>सत्यापित हो रहा है…</p>
-          <p style={{ margin: "6px 0 0", fontSize: 13, opacity: 0.7 }}>कृपया प्रतीक्षा करें।</p>
+        <div className="loading-overlay">
+          <div className="loading-spinner"></div>
+          <p className="loading-text">सत्यापित हो रहा है…</p>
+          <p className="loading-subtext">कृपया प्रतीक्षा करें।</p>
         </div>
       )}
 
-      {/* ─── Scoped styles ─── */}
+      {/* ═══════════════════════════════════════════════════════
+          ALL SCOPED STYLES
+          ═══════════════════════════════════════════════════════  */}
       <style>{`
+        .login-container {
+          font-family: 'Segoe UI', 'Noto Sans Devanagari', sans-serif, Arial;
+          min-height: 100vh;
+          background-image: url(${backgroundImage});
+          background-size: cover;
+          background-position: center;
+          background-repeat: no-repeat;
+          background-attachment: fixed;
+          position: relative;
+        }
+        
+        .login-container::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background: rgba(255, 255, 255, 0.88);
+          z-index: 0;
+        }
+        
         .top-navbar {
           position: relative;
           z-index: 100;
           display: flex;
           align-items: center;
           justify-content: space-between;
-          background: #ffffff;
+          background: rgba(255, 255, 255, 0.95);
           padding: 14px 32px;
           box-shadow: 0 2px 8px rgba(0,0,0,0.08);
           border-radius: 0 0 16px 16px;
           margin: 12px 24px 0;
           flex-wrap: wrap;
           gap: 12px;
+          backdrop-filter: blur(5px);
         }
+        
+        .main-content {
+          position: relative;
+          z-index: 10;
+          min-height: calc(100vh - 100px);
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          padding: 40px 20px;
+        }
+        
+        .modal-wrapper {
+          position: relative;
+          z-index: 20;
+          width: 100%;
+          max-width: 460px;
+          margin: 0 auto;
+        }
+        
+        .card {
+          background: rgba(255, 255, 255, 0.98);
+          border-radius: 16px;
+          padding: 30px;
+          box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+          border-top: 4px solid #e8611a !important;
+          backdrop-filter: blur(10px);
+          border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        
         .navbar-left {
           display: flex;
           align-items: center;
           gap: 16px;
         }
-        .navbar-titles { display: flex; flex-direction: column; }
+        
+        .navbar-titles { 
+          display: flex; 
+          flex-direction: column; 
+        }
+        
         .navbar-party-name {
           margin: 0;
           font-size: 26px;
@@ -597,6 +617,7 @@ const LoginPage = ({ onLogin }) => {
           font-family: 'Noto Sans Devanagari', sans-serif, Arial;
           letter-spacing: 0.5px;
         }
+        
         .navbar-subtitle {
           margin: 2px 0 0;
           font-size: 13px;
@@ -604,7 +625,13 @@ const LoginPage = ({ onLogin }) => {
           font-weight: 500;
           font-family: 'Noto Sans Devanagari', sans-serif, Arial;
         }
-        .navbar-right { display: flex; align-items: center; gap: 12px; }
+        
+        .navbar-right { 
+          display: flex; 
+          align-items: center; 
+          gap: 12px; 
+        }
+        
         .nav-link-btn {
           background: #fff;
           border: 1.5px solid #cbd5e0;
@@ -617,7 +644,12 @@ const LoginPage = ({ onLogin }) => {
           transition: all 0.2s;
           font-family: 'Noto Sans Devanagari', sans-serif, Arial;
         }
-        .nav-link-btn:hover { background: #f0f4f8; border-color: #1a3c5e; }
+        
+        .nav-link-btn:hover { 
+          background: #f0f4f8; 
+          border-color: #1a3c5e; 
+        }
+        
         .nav-donate-btn {
           background: #1a3c5e;
           color: #fff;
@@ -629,14 +661,85 @@ const LoginPage = ({ onLogin }) => {
           cursor: pointer;
           transition: background 0.2s;
         }
-        .nav-donate-btn:hover { background: #14304d; }
-        .card { border-top: 4px solid #e8611a !important; }
+        
+        .nav-donate-btn:hover { 
+          background: #14304d; 
+        }
+        
         .card-logo {
           display: flex;
           justify-content: center;
           align-items: center;
           margin-bottom: 18px;
         }
+        
+        .card-title {
+          text-align: center;
+          margin: 0 0 10px;
+          font-size: 24px;
+          font-weight: 700;
+          color: #1a3c5e;
+        }
+        
+        .card-info {
+          text-align: center;
+          color: #666;
+          font-size: 14px;
+          margin-bottom: 24px;
+        }
+        
+        .success-banner {
+          background: #edfbf0;
+          border: 1px solid #4caf50;
+          border-radius: 8px;
+          padding: 10px 14px;
+          margin-bottom: 18px;
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          font-size: 13px;
+          color: #2e7d32;
+          font-weight: 500;
+        }
+        
+        .field-label {
+          display: block;
+          margin: 15px 0 8px;
+          font-weight: 600;
+          color: #333;
+          font-size: 14px;
+        }
+        
+        .phone-input-row {
+          display: flex;
+          align-items: center;
+          border: 1.5px solid #cbd5e0;
+          border-radius: 8px;
+          overflow: hidden;
+        }
+        
+        .country-code {
+          background: #f0f4f8;
+          padding: 12px 16px;
+          border-right: 1px solid #cbd5e0;
+          color: #333;
+          font-weight: 600;
+        }
+        
+        .arrow {
+          margin-left: 6px;
+          font-size: 10px;
+          opacity: 0.6;
+        }
+        
+        .phone-input {
+          flex: 1;
+          border: none;
+          padding: 12px 16px;
+          font-size: 15px;
+          outline: none;
+        }
+        
         .clear-btn {
           background: none;
           border: none;
@@ -646,16 +749,345 @@ const LoginPage = ({ onLogin }) => {
           font-size: 18px;
           transition: color 0.2s;
         }
-        .clear-btn:hover { color: #e8611a !important; }
+        
+        .clear-btn:hover { 
+          color: #e8611a !important; 
+        }
+        
+        .country-label {
+          font-size: 12px;
+          color: #666;
+          margin-top: 4px;
+          margin-left: 4px;
+        }
+        
+        .field-section {
+          max-height: 0;
+          overflow: hidden;
+          opacity: 0;
+          transition: all 0.4s ease;
+        }
+        
+        .field-section.visible {
+          max-height: 200px;
+          opacity: 1;
+        }
+        
+        .email-header {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+        }
+        
+        .email-input {
+          width: 100%;
+          padding: 12px 16px;
+          border: 1.5px solid #cbd5e0;
+          border-radius: 8px;
+          font-size: 15px;
+          outline: none;
+          transition: border-color 0.2s;
+        }
+        
+        .email-input.error {
+          border-color: #e03a3a;
+        }
+        
+        .clear-email-btn {
+          background: none;
+          border: none;
+          color: #888;
+          font-size: 12px;
+          cursor: pointer;
+          padding: 2px 8px;
+        }
+        
+        .clear-email-btn:hover {
+          color: #e8611a;
+        }
+        
+        .email-error-msg {
+          color: #e03a3a;
+          font-size: 12px;
+          margin-top: 4px;
+          text-align: left;
+        }
+        
         .otp-instructions {
           text-align: center;
           margin-bottom: 15px;
           margin-top: 5px;
         }
-        button { font-family: inherit; }
+        
+        .otp-boxes {
+          display: flex;
+          justify-content: center;
+          gap: 10px;
+          margin-bottom: 10px;
+        }
+        
+        .otp-box {
+          width: 44px;
+          height: 44px;
+          text-align: center;
+          font-size: 20px;
+          font-weight: 600;
+          border: 2px solid #cbd5e0;
+          border-radius: 8px;
+          outline: none;
+          transition: all 0.2s;
+        }
+        
+        .otp-box:focus {
+          border-color: #e8611a;
+          box-shadow: 0 0 0 3px rgba(232, 97, 26, 0.1);
+        }
+        
+        .otp-box.error {
+          border-color: #e03a3a;
+          background: #fff0f0;
+        }
+        
+        .timer-row {
+          display: flex;
+          justify-content: space-between;
+          margin: 15px 0;
+          font-size: 13px;
+        }
+        
+        .timer-label {
+          color: #666;
+        }
+        
+        .timer-value {
+          color: #333;
+          font-weight: 600;
+        }
+        
+        .timer-expired {
+          color: #e03a3a;
+        }
+        
+        .resend-row {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 8px;
+          font-size: 13px;
+          color: #666;
+          margin-top: 10px;
+        }
+        
+        .resend-btn {
+          background: none;
+          border: none;
+          color: #e8611a;
+          cursor: pointer;
+          font-weight: 600;
+          padding: 0;
+        }
+        
+        .resend-btn:disabled {
+          color: #aaa;
+          cursor: not-allowed;
+        }
+        
+        .otp-expired-msg {
+          text-align: center;
+          color: #e03a1e;
+          font-size: 13px;
+          margin-top: 10px;
+          font-weight: 500;
+        }
+        
+        .consent-row {
+          display: flex;
+          align-items: flex-start;
+          gap: 10px;
+          margin: 20px 0;
+        }
+        
+        .consent-text {
+          font-size: 13px;
+          color: #444;
+          line-height: 1.4;
+        }
+        
+        .btn-otp {
+          width: 100%;
+          padding: 16px;
+          background: #e8611a;
+          color: white;
+          border: none;
+          border-radius: 10px;
+          font-size: 16px;
+          font-weight: 600;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 8px;
+          transition: all 0.2s;
+        }
+        
+        .btn-otp:hover:not(:disabled) {
+          background: #d45515;
+          transform: translateY(-1px);
+          box-shadow: 0 4px 12px rgba(232, 97, 26, 0.3);
+        }
+        
+        .btn-otp:disabled {
+          background: #f0b088;
+          cursor: not-allowed;
+          transform: none;
+        }
+        
+        .spinner {
+          display: inline-block;
+          width: 16px;
+          height: 16px;
+          border: 2px solid rgba(255, 255, 255, 0.3);
+          border-radius: 50%;
+          border-top-color: #fff;
+          animation: spin 0.8s linear infinite;
+        }
+        
+        .enter-hint {
+          font-size: 12px;
+          opacity: 0.8;
+          margin-left: 4px;
+        }
+        
+        .register-link {
+          margin-top: 18px;
+          text-align: center;
+          font-size: 13px;
+          color: #666;
+        }
+        
+        .register-link-btn {
+          color: #e8611a;
+          font-weight: 600;
+          text-decoration: none;
+          margin-left: 4px;
+        }
+        
+        .register-link-btn:hover {
+          text-decoration: underline;
+        }
+        
+        .help-section {
+          margin-top: 14px;
+          text-align: center;
+          font-size: 12px;
+          color: #666;
+          padding: 0 10px;
+        }
+        
+        .help-btn {
+          color: #e8611a;
+          background: none;
+          border: none;
+          cursor: pointer;
+          text-decoration: underline;
+          margin-left: 4px;
+          font-size: 12px;
+        }
+        
+        .loading-overlay {
+          position: fixed;
+          inset: 0;
+          background: rgba(0,0,0,0.75);
+          z-index: 9999;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          color: #fff;
+          backdrop-filter: blur(5px);
+        }
+        
+        .loading-spinner {
+          width: 52px;
+          height: 52px;
+          border: 4px solid rgba(255,255,255,0.25);
+          border-top: 4px solid #e8611a;
+          border-radius: 50%;
+          animation: spin 0.8s linear infinite;
+          margin-bottom: 18px;
+        }
+        
+        .loading-text {
+          margin: 0;
+          font-size: 17px;
+          font-weight: 600;
+        }
+        
+        .loading-subtext {
+          margin: 6px 0 0;
+          font-size: 13px;
+          opacity: 0.7;
+        }
+        
+        .toast {
+          position: fixed;
+          bottom: 30px;
+          left: 50%;
+          transform: translateX(-50%);
+          background: rgba(51, 51, 51, 0.95);
+          color: white;
+          padding: 12px 24px;
+          border-radius: 8px;
+          font-size: 14px;
+          z-index: 1000;
+          opacity: 0;
+          transition: opacity 0.3s;
+          backdrop-filter: blur(10px);
+        }
+        
+        .toast.show {
+          opacity: 1;
+        }
+        
         @keyframes spin {
-          0%   { transform: rotate(0deg); }
+          0% { transform: rotate(0deg); }
           100% { transform: rotate(360deg); }
+        }
+        
+        @media (max-width: 768px) {
+          .top-navbar {
+            padding: 12px 20px;
+            margin: 8px 16px 0;
+            flex-direction: column;
+            gap: 16px;
+          }
+          
+          .navbar-right {
+            width: 100%;
+            justify-content: center;
+          }
+          
+          .navbar-party-name {
+            font-size: 22px;
+          }
+          
+          .navbar-subtitle {
+            font-size: 12px;
+          }
+          
+          .card {
+            padding: 24px;
+          }
+          
+          .otp-boxes {
+            gap: 6px;
+          }
+          
+          .otp-box {
+            width: 38px;
+            height: 38px;
+            font-size: 18px;
+          }
         }
       `}</style>
     </div>
