@@ -4,15 +4,14 @@ import { useNavigate } from "react-router-dom";
 function ProfilePage() {
   const navigate = useNavigate();
 
-  // ─── State - All fields are blank by default ───
-  const [gender, setGender] = useState("");
-  const [profileImage, setProfileImage] = useState(null);
-  const [agreedToUpdates, setAgreedToUpdates] = useState(false);
-  const [isSaving, setIsSaving] = useState(false);
+  // ─── Avatar ───
+  const [avatarPreview, setAvatarPreview] = useState(null);
 
+  // ─── Form state ───
   const [form, setForm] = useState({
-    title: "",
+    title: "श्री",
     name: "",
+    gender: "",
     email: "",
     mobile: "",
     dob: "",
@@ -21,759 +20,711 @@ function ProfilePage() {
     state: "",
     district: "",
     ac: "",
+    consent: false,
   });
 
-  const set = (field) => (e) =>
-    setForm((prev) => ({ ...prev, [field]: e.target.value }));
-
-  // Check authentication on mount and load saved profile data
+  // ─── Load saved data ───
   useEffect(() => {
-    const isAuthenticated = localStorage.getItem("nyaypaksh_authenticated");
-    const userData = localStorage.getItem("nyaypaksh_user");
-    
-    if (!isAuthenticated || isAuthenticated !== "true" || !userData) {
-      navigate("/login", { replace: true });
-      return;
-    }
-
-    // Load saved profile data if exists
     const savedProfile = localStorage.getItem("nyaypaksh_profile");
     if (savedProfile) {
       try {
-        const profileData = JSON.parse(savedProfile);
-        
-        // Update form with saved data
-        if (profileData.form) {
-          setForm(profileData.form);
+        const profile = JSON.parse(savedProfile);
+        if (profile.form) {
+          setForm(profile.form);
         }
-        
-        // Update gender
-        if (profileData.gender) {
-          setGender(profileData.gender);
-        }
-        
-        // Update profile image
-        if (profileData.profileImage) {
-          setProfileImage(profileData.profileImage);
-        }
-        
-        // Update consent
-        if (profileData.agreedToUpdates !== undefined) {
-          setAgreedToUpdates(profileData.agreedToUpdates);
+        if (profile.avatarPreview) {
+          setAvatarPreview(profile.avatarPreview);
         }
       } catch (error) {
-        console.error("Error loading saved profile:", error);
+        console.error("Error loading profile:", error);
       }
     }
-  }, [navigate]);
+  }, []);
 
-  // ─── Image upload ───
-  const handleImageChange = (e) => {
-    const file = e.target.files[0];
+  // ─── Update form helper ───
+  const updateForm = (field, value) => {
+    setForm(prev => ({ ...prev, [field]: value }));
+  };
+
+  // ─── Avatar upload ───
+  const handleAvatarChange = (e) => {
+    const file = e.target.files?.[0];
     if (file) {
       const reader = new FileReader();
-      reader.onload = () => setProfileImage(reader.result);
+      reader.onload = () => setAvatarPreview(reader.result);
       reader.readAsDataURL(file);
     }
   };
 
-  // ─── Validate required fields ───
-  const validateForm = () => {
-    const requiredFields = ['title', 'name', 'dob', 'address', 'pincode', 'state', 'district', 'ac'];
-    const missingFields = [];
-    
-    requiredFields.forEach(field => {
-      if (!form[field] || form[field].trim() === '') {
-        missingFields.push(field);
-      }
-    });
-    
-    if (!gender) {
-      missingFields.push('gender');
-    }
-    
-    return missingFields;
+  // ─── Generate Membership Number ───
+  const generateMembershipNumber = () => {
+    const now = new Date();
+    const year = now.getFullYear().toString().slice(-2);
+    const month = (now.getMonth() + 1).toString().padStart(2, '0');
+    const random = Math.floor(1000 + Math.random() * 9000);
+    return `NPP-${year}${month}-${random}`;
   };
 
   // ─── Save Profile ───
   const handleSave = () => {
     // Validate required fields
-    const missingFields = validateForm();
-    if (missingFields.length > 0) {
-      alert(`Please fill all required fields:\n${missingFields.join(', ')}`);
+    if (!form.name.trim()) {
+      alert("Please enter your name");
+      return;
+    }
+    if (!form.mobile || form.mobile.length !== 10) {
+      alert("Please enter a valid 10-digit mobile number");
+      return;
+    }
+    if (!form.email || !form.email.includes('@')) {
+      alert("Please enter a valid email address");
+      return;
+    }
+    if (!form.state) {
+      alert("Please select your state");
+      return;
+    }
+    if (!form.consent) {
+      alert("Please agree to receive party updates");
       return;
     }
 
-    setIsSaving(true);
-    
-    // Save profile data to localStorage
-    const profileData = {
-      form,
-      gender,
-      profileImage,
-      agreedToUpdates,
-      lastUpdated: new Date().toISOString(),
-      isComplete: true
+    // Generate membership data
+    const membershipNumber = generateMembershipNumber();
+    const joinedDate = new Date();
+    const validTillDate = new Date(joinedDate);
+    validTillDate.setFullYear(validTillDate.getFullYear() + 1);
+
+    // Format dates for display
+    const formatDate = (date) => {
+      const day = date.getDate().toString().padStart(2, '0');
+      const month = (date.getMonth() + 1).toString().padStart(2, '0');
+      const year = date.getFullYear();
+      return `${day}-${month}-${year}`;
     };
-    
-    localStorage.setItem("nyaypaksh_profile", JSON.stringify(profileData));
-    
-    // Mark profile as complete
-    localStorage.setItem("nyaypaksh_profile_complete", "true");
-    
-    // Update user data with profile info
-    const userDataStr = localStorage.getItem("nyaypaksh_user");
-    if (userDataStr) {
+
+    const joinedDateStr = formatDate(joinedDate);
+    const validTillStr = formatDate(validTillDate);
+
+    console.log("Generated Membership:", {
+      number: membershipNumber,
+      joined: joinedDateStr,
+      validTill: validTillStr
+    });
+
+    // Get existing user data
+    const existingUserStr = localStorage.getItem("nyaypaksh_user");
+    let userData = {};
+    if (existingUserStr) {
       try {
-        const userData = JSON.parse(userDataStr);
-        const updatedUserData = {
-          ...userData,
-          fullName: form.name,
-          email: form.email,
-          phone: form.mobile,
-          gender: gender,
-          profileComplete: true,
-          profileUpdated: new Date().toISOString()
-        };
-        localStorage.setItem("nyaypaksh_user", JSON.stringify(updatedUserData));
-      } catch (error) {
-        console.error("Error updating user data:", error);
+        userData = JSON.parse(existingUserStr);
+      } catch (e) {
+        console.error("Error parsing user data:", e);
       }
     }
+
+    // Update user data
+    const updatedUserData = {
+      ...userData,
+      fullName: form.name,
+      email: form.email,
+      phone: form.mobile,
+      membershipNumber: membershipNumber
+    };
+
+    // Prepare profile data
+    const profileData = {
+      form: form,
+      avatarPreview: avatarPreview,
+      isComplete: true,
+      membershipInfo: {
+        membershipNumber: membershipNumber,
+        joinedDate: joinedDate.toISOString(),
+        joinedDateDisplay: joinedDateStr,
+        validTill: validTillDate.toISOString(),
+        validTillDisplay: validTillStr,
+        generatedAt: new Date().toISOString()
+      }
+    };
+
+    // Save to localStorage
+    localStorage.setItem("nyaypaksh_user", JSON.stringify(updatedUserData));
+    localStorage.setItem("nyaypaksh_profile", JSON.stringify(profileData));
+    localStorage.setItem("nyaypaksh_profile_complete", "true");
     
+    // Also save membership separately for easy access
+    const membershipData = {
+      membershipNumber: membershipNumber,
+      joinedDate: joinedDate.toISOString(),
+      joinedDateDisplay: joinedDateStr,
+      validTill: validTillDate.toISOString(),
+      validTillDisplay: validTillStr,
+      status: "pending",
+      termsAccepted: false
+    };
+    localStorage.setItem("nyaypaksh_membership", JSON.stringify(membershipData));
+
+    // Set flag for dashboard success message
+    sessionStorage.setItem("profile_just_saved", "true");
+
     // Show success message
-    setTimeout(() => {
-      setIsSaving(false);
-      alert("✓ Profile saved successfully!");
-      
-      // Set flag for dashboard to show success banner
-      sessionStorage.setItem("profile_just_saved", "true");
-      
-      // Redirect to dashboard after 1 second
-      setTimeout(() => {
-        navigate("/dashboard", { replace: true });
-      }, 1000);
-    }, 1500);
+    alert(`✅ Profile saved successfully!\n\nYour Membership Details:\n• Number: ${membershipNumber}\n• Joined: ${joinedDateStr}\n• Valid Till: ${validTillStr}\n\nYou will need to accept the terms on the dashboard to activate your membership.`);
+
+    // Navigate to dashboard
+    navigate("/dashboard");
   };
 
-  // ─── Default avatar SVG ───
-  const DefaultAvatar = () => (
-    <svg viewBox="0 0 120 120" width="140" height="140">
-      <defs>
-        <linearGradient id="avatarGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-          <stop offset="0%" stopColor="#f5a623" />
-          <stop offset="100%" stopColor="#f7c948" />
-        </linearGradient>
-      </defs>
-      <circle cx="60" cy="60" r="58" fill="url(#avatarGrad)" />
-      <circle cx="60" cy="42" r="16" fill="#3d2b6b" />
-      <ellipse cx="60" cy="88" rx="28" ry="22" fill="#3d2b6b" />
-    </svg>
-  );
-
   return (
-    <div className="pp-page">
-      {/* ─── HEADER BANNER ─── */}
-      <div className="pp-header">
-        <span className="pp-badge">NYAYA PAKSHAK PROFILE</span>
-        <h1 className="pp-title">न्याय पक्षक विवरण</h1>
+    <div className="profile-page">
+      {/* Header */}
+      <div className="profile-header">
+        <div className="profile-badge">NYAYA PAKSHAK PROFILE</div>
+        <h1 className="profile-main-title">न्याय पक्षक विवरण</h1>
+        <p className="profile-subtitle">Complete your profile to generate membership card</p>
       </div>
 
-      {/* ─── MAIN CARD ─── */}
-      <div className="pp-card">
-        {/* LEFT SIDEBAR */}
-        <aside className="pp-sidebar">
-          <div className="pp-avatar-wrap" onClick={() => document.getElementById("pp-upload").click()}>
-            {profileImage ? (
-              <img src={profileImage} alt="Profile" className="pp-avatar-img" />
+      {/* Main Content */}
+      <div className="profile-content">
+        {/* Sidebar - Avatar */}
+        <div className="profile-sidebar">
+          <label className="sidebar-label">प्रोफ़ाइल फोटो</label>
+          
+          <div className="avatar-circle" onClick={() => document.getElementById("avatarInput").click()}>
+            {avatarPreview ? (
+              <img src={avatarPreview} alt="Avatar" className="avatar-img" />
             ) : (
-              <DefaultAvatar />
+              <svg viewBox="0 0 120 120" className="avatar-placeholder">
+                <circle cx="60" cy="60" r="60" fill="#e8611a" opacity="0.2" />
+                <circle cx="60" cy="45" r="18" fill="#1a3c5e" opacity="0.6" />
+                <ellipse cx="60" cy="90" rx="28" ry="20" fill="#1a3c5e" opacity="0.6" />
+              </svg>
             )}
           </div>
 
           <input
             type="file"
-            id="pp-upload"
-            accept="image/png,image/jpeg,image/jpg"
+            id="avatarInput"
+            accept="image/*"
+            onChange={handleAvatarChange}
             style={{ display: "none" }}
-            onChange={handleImageChange}
           />
 
-          <button className="pp-upload-btn" onClick={() => document.getElementById("pp-upload").click()}>
+          <button className="avatar-upload-btn" onClick={() => document.getElementById("avatarInput").click()}>
             फोटो अपडेट करें
           </button>
 
-          <p className="pp-photo-label">प्रोफ़ाइल फोटो</p>
-          <p className="pp-photo-hint">कृपया कैमरा या गैलरी से फोटो चुनें।</p>
-        </aside>
+          <p className="avatar-hint">कृपया अपनी नवीनतम फोटो अपलोड करें।</p>
 
-        {/* FORM AREA */}
-        <main className="pp-form-area">
-          <h2 className="pp-section-title">PERSONAL DETAILS</h2>
+          <div className="preview-box">
+            <h4>Membership Information:</h4>
+            <p><strong>Will be generated after saving:</strong></p>
+            <p>• Unique Membership Number</p>
+            <p>• 1 Year Validity</p>
+            <p>• Digital Membership Card</p>
+          </div>
+        </div>
 
-          {/* ROW 1 — Title | Name | Gender */}
-          <div className="pp-row pp-row-3">
-            <div className="pp-group">
-              <label>Title <span className="pp-req">*</span></label>
-              <select className="pp-input" value={form.title} onChange={set("title")}>
-                <option value="">Select Title</option>
-                <option value="श्री">श्री</option>
-                <option value="श्रीमती">श्रीमती</option>
-                <option value="सुश्री">सुश्री</option>
-                <option value="Mr.">Mr.</option>
-                <option value="Ms.">Ms.</option>
-                <option value="Mrs.">Mrs.</option>
-              </select>
-            </div>
+        {/* Form Area */}
+        <div className="profile-form-area">
+          <h2 className="form-section-title">PERSONAL DETAILS</h2>
 
-            <div className="pp-group">
-              <label>Name <span className="pp-req">*</span></label>
-              <input 
-                type="text" 
-                className="pp-input" 
-                value={form.name} 
-                onChange={set("name")} 
-                placeholder="Enter your full name" 
-              />
-            </div>
+          <div className="form-grid">
+            {/* Row 1 */}
+            <div className="form-row">
+              <div className="form-field">
+                <label className="field-label">Title</label>
+                <select className="field-input" value={form.title} onChange={(e) => updateForm("title", e.target.value)}>
+                  <option value="श्री">श्री</option>
+                  <option value="श्रीमती">श्रीमती</option>
+                  <option value="सुश्री">सुश्री</option>
+                </select>
+              </div>
 
-            <div className="pp-group">
-              <label>Gender <span className="pp-req">*</span></label>
-              <div className="pp-gender-wrap">
-                {["Male", "Female", "Other"].map((g) => (
-                  <button
-                    key={g}
-                    type="button"
-                    className={`pp-gender-btn ${gender === g ? "active" : ""}`}
-                    onClick={() => setGender(g)}
-                  >
-                    {g}
-                  </button>
-                ))}
+              <div className="form-field">
+                <label className="field-label">Name *</label>
+                <input
+                  type="text"
+                  className="field-input"
+                  placeholder="अपना नाम दर्ज करें"
+                  value={form.name}
+                  onChange={(e) => updateForm("name", e.target.value)}
+                />
+              </div>
+
+              <div className="form-field">
+                <label className="field-label">Gender</label>
+                <div className="gender-pills">
+                  {["Male", "Female", "Other"].map((g) => (
+                    <button
+                      key={g}
+                      type="button"
+                      className={`gender-pill ${form.gender === g ? "active" : ""}`}
+                      onClick={() => updateForm("gender", g)}
+                    >
+                      {g}
+                    </button>
+                  ))}
+                </div>
               </div>
             </div>
-          </div>
 
-          {/* ROW 2 — Email | Mobile | DOB */}
-          <div className="pp-row pp-row-3">
-            <div className="pp-group">
-              <label>Email ID</label>
-              <input 
-                type="email" 
-                className="pp-input" 
-                value={form.email} 
-                onChange={set("email")} 
-                placeholder="Enter your email address" 
-              />
-            </div>
+            {/* Row 2 */}
+            <div className="form-row">
+              <div className="form-field">
+                <label className="field-label">Email Address *</label>
+                <input
+                  type="email"
+                  className="field-input"
+                  placeholder="आपका ईमेल दर्ज करें"
+                  value={form.email}
+                  onChange={(e) => updateForm("email", e.target.value)}
+                />
+              </div>
 
-            <div className="pp-group">
-              <label>Mobile Number</label>
-              <div className="pp-mobile-wrap">
-                <span className="pp-mobile-prefix">+91</span>
-                <input 
-                  type="tel" 
-                  className="pp-input pp-mobile-input" 
-                  value={form.mobile} 
-                  onChange={set("mobile")} 
-                  placeholder="Enter 10-digit mobile number" 
-                  maxLength={10} 
+              <div className="form-field">
+                <label className="field-label">Mobile Number *</label>
+                <div className="mobile-wrapper">
+                  <span className="mobile-prefix">+91</span>
+                  <input
+                    type="tel"
+                    className="field-input mobile-main"
+                    placeholder="मोबाइल नंबर दर्ज करें"
+                    value={form.mobile}
+                    onChange={(e) => updateForm("mobile", e.target.value.replace(/\D/g, "").slice(0, 10))}
+                    maxLength="10"
+                  />
+                </div>
+              </div>
+
+              <div className="form-field">
+                <label className="field-label">Date of Birth</label>
+                <input
+                  type="date"
+                  className="field-input"
+                  value={form.dob}
+                  onChange={(e) => updateForm("dob", e.target.value)}
+                  max={new Date().toISOString().split("T")[0]}
                 />
               </div>
             </div>
 
-            <div className="pp-group">
-              <label>Date of Birth <span className="pp-req">*</span></label>
-              <input 
-                type="date" 
-                className="pp-input" 
-                value={form.dob} 
-                onChange={set("dob")} 
-              />
+            {/* Row 3 */}
+            <div className="form-row">
+              <div className="form-field">
+                <label className="field-label">Address</label>
+                <textarea
+                  className="field-input field-textarea"
+                  placeholder="अपना पता दर्ज करें"
+                  value={form.address}
+                  onChange={(e) => updateForm("address", e.target.value)}
+                  rows="3"
+                />
+              </div>
+
+              <div className="form-field">
+                <label className="field-label">Pincode</label>
+                <input
+                  type="text"
+                  className="field-input"
+                  placeholder="पिन कोड दर्ज करें"
+                  value={form.pincode}
+                  onChange={(e) => updateForm("pincode", e.target.value.replace(/\D/g, "").slice(0, 6))}
+                  maxLength="6"
+                />
+              </div>
+
+              <div className="form-field">
+                <label className="field-label">State *</label>
+                <select 
+                  className="field-input" 
+                  value={form.state} 
+                  onChange={(e) => updateForm("state", e.target.value)}
+                >
+                  <option value="">राज्य चुनें</option>
+                  <option value="तेलंगाना">तेलंगाना</option>
+                  <option value="आंध्र प्रदेश">आंध्र प्रदेश</option>
+                  <option value="कर्नाटक">कर्नाटक</option>
+                  <option value="महाराष्ट्र">महाराष्ट्र</option>
+                  <option value="तमिलनाडु">तमिलनाडु</option>
+                </select>
+              </div>
+            </div>
+
+            {/* Row 4 */}
+            <div className="form-row form-row-2col">
+              <div className="form-field">
+                <label className="field-label">District</label>
+                <input
+                  type="text"
+                  className="field-input"
+                  placeholder="जिला दर्ज करें"
+                  value={form.district}
+                  onChange={(e) => updateForm("district", e.target.value)}
+                />
+              </div>
+
+              <div className="form-field">
+                <label className="field-label">Assembly Constituency (AC)</label>
+                <input
+                  type="text"
+                  className="field-input"
+                  placeholder="विधानसभा क्षेत्र दर्ज करें"
+                  value={form.ac}
+                  onChange={(e) => updateForm("ac", e.target.value)}
+                />
+              </div>
             </div>
           </div>
 
-          {/* ROW 3 — Address | Pincode | State */}
-          <div className="pp-row pp-row-3">
-            <div className="pp-group">
-              <label>Address <span className="pp-req">*</span></label>
-              <textarea 
-                className="pp-input pp-textarea" 
-                rows={3} 
-                value={form.address} 
-                onChange={set("address")} 
-                placeholder="Enter your complete address" 
-              />
-            </div>
-
-            <div className="pp-group">
-              <label>Pincode <span className="pp-req">*</span></label>
-              <input 
-                type="text" 
-                className="pp-input" 
-                value={form.pincode} 
-                onChange={set("pincode")} 
-                placeholder="Enter 6-digit pincode" 
-                maxLength={6} 
-              />
-            </div>
-
-            <div className="pp-group">
-              <label>State <span className="pp-req">*</span></label>
-              <select className="pp-input" value={form.state} onChange={set("state")}>
-                <option value="">Select State</option>
-                <option value="तेलंगाना">तेलंगाना</option>
-                <option value="आंध्र प्रदेश">आंध्र प्रदेश</option>
-                <option value="तमिलनाडु">तमिलनाडु</option>
-                <option value="कर्नाटक">कर्नाटक</option>
-                <option value="दिल्ली">दिल्ली</option>
-                <option value="महाराष्ट्र">महाराष्ट्र</option>
-                <option value="हरियाणा">हरियाणा</option>
-                <option value="केरल">केरल</option>
-              </select>
-            </div>
-          </div>
-
-          {/* ROW 4 — District | AC */}
-          <div className="pp-row pp-row-2">
-            <div className="pp-group">
-              <label>District <span className="pp-req">*</span></label>
-              <input 
-                type="text" 
-                className="pp-input" 
-                value={form.district} 
-                onChange={set("district")} 
-                placeholder="Enter your district" 
-              />
-            </div>
-
-            <div className="pp-group">
-              <label>Assembly Constituency (AC) <span className="pp-req">*</span></label>
-              <input 
-                type="text" 
-                className="pp-input" 
-                value={form.ac} 
-                onChange={set("ac")} 
-                placeholder="Enter your assembly constituency" 
-              />
-            </div>
-          </div>
-
-          {/* CONSENT */}
-          <div className="pp-consent">
-            <label className="pp-consent-label">
+          {/* Consent */}
+          <div className="consent-box">
+            <label className="consent-label">
               <input
                 type="checkbox"
-                checked={agreedToUpdates}
-                onChange={(e) => setAgreedToUpdates(e.target.checked)}
-                className="pp-consent-check"
+                className="consent-checkbox"
+                checked={form.consent}
+                onChange={(e) => updateForm("consent", e.target.checked)}
               />
-              <span>मैं यह प्रतिज्ञा करता/करती हूँ कि मुझे पार्टी के नियमित अपडेट प्राप्त हों।</span>
+              <span className="consent-text">
+                मैं यह प्रतिज्ञा करता/करती हूँ कि मुझे पार्टी के नियमित अपडेट प्राप्त हों। *
+              </span>
             </label>
           </div>
 
-          {/* SAVE BUTTON */}
-          <div className="pp-actions">
-            <button 
-              type="button" 
-              className="pp-save-btn" 
-              onClick={handleSave}
-              disabled={isSaving}
-              style={{ 
-                position: "relative",
-                opacity: isSaving ? 0.8 : 1,
-                cursor: isSaving ? "not-allowed" : "pointer"
-              }}
-            >
-              {isSaving ? (
-                <>
-                  <span style={{ marginRight: "10px" }}>⏳</span>
-                  Saving...
-                </>
-              ) : (
-                "Save Profile"
-              )}
+          {/* Save Button */}
+          <div className="save-btn-wrap">
+            <button className="save-btn" onClick={handleSave}>
+              Save Profile & Generate Membership →
             </button>
           </div>
-        </main>
+
+          {/* Info Box */}
+          <div className="info-box">
+            <h4>Important:</h4>
+            <p>• Fields marked with * are required</p>
+            <p>• Membership number will be generated automatically</p>
+            <p>• Membership validity: 1 year from registration</p>
+            <p>• You need to accept terms on dashboard to activate membership</p>
+          </div>
+        </div>
       </div>
 
-      {/* Loading Overlay */}
-      {isSaving && (
-        <div style={{
-          position: "fixed",
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          background: "rgba(0, 0, 0, 0.5)",
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center",
-          zIndex: 9999,
-          color: "white",
-        }}>
-          <div style={{
-            width: "60px",
-            height: "60px",
-            border: "4px solid rgba(255,255,255,0.3)",
-            borderTop: "4px solid #e8611a",
-            borderRadius: "50%",
-            animation: "spin 1s linear infinite",
-            marginBottom: "20px"
-          }}></div>
-          <p style={{ fontSize: "18px", fontWeight: "600", margin: 0 }}>Saving Profile...</p>
-          <p style={{ fontSize: "14px", opacity: 0.8, marginTop: "8px" }}>Redirecting to dashboard</p>
-        </div>
-      )}
-
-      {/* ════════════════════ SCOPED CSS ════════════════════ */}
+      {/* CSS */}
       <style>{`
-        .pp-page {
-          font-family: 'Segoe UI', 'Noto Sans Devanagari', sans-serif, Arial;
-          background: #f0eee8;
+        .profile-page {
+          font-family: 'Segoe UI', 'Noto Sans Devanagari', sans-serif;
+          background: #fef8f0;
           min-height: 100vh;
-          padding-bottom: 60px;
-          color: #333;
+          padding: 0;
         }
-
-        .pp-header {
-          background: linear-gradient(180deg, #fde8d0 0%, #f0eee8 100%);
+        
+        .profile-header {
+          background: linear-gradient(135deg, #fde4d0, #fcd9bd);
+          padding: 25px 30px;
           text-align: center;
-          padding: 38px 20px 32px;
+          border-bottom: 3px solid #e8611a;
         }
-
-        .pp-badge {
+        
+        .profile-badge {
           display: inline-block;
-          background: #fff3e6;
-          border: 1.5px solid #f5c88a;
-          color: #d4863a;
-          font-size: 13px;
-          font-weight: 700;
-          letter-spacing: 1.8px;
-          padding: 6px 22px;
-          border-radius: 30px;
-          margin-bottom: 12px;
-        }
-
-        .pp-title {
-          margin: 0;
-          font-size: 38px;
-          font-weight: 800;
-          color: #1a1a2e;
-          letter-spacing: 0.5px;
-        }
-
-        .pp-card {
-          display: flex;
-          background: #ffffff;
+          background: white;
+          border: 2px solid #e8611a;
           border-radius: 20px;
-          box-shadow: 0 4px 24px rgba(0, 0, 0, 0.07);
-          margin: 0 auto;
-          max-width: 1180px;
-          width: calc(100% - 48px);
-          overflow: hidden;
+          padding: 5px 15px;
+          font-size: 12px;
+          font-weight: bold;
+          color: #e8611a;
+          margin-bottom: 10px;
         }
-
-        .pp-sidebar {
-          width: 260px;
-          min-width: 260px;
-          background: #fafafa;
-          border-right: 1px solid #eee;
+        
+        .profile-main-title {
+          margin: 0;
+          font-size: 28px;
+          font-weight: 800;
+          color: #1a3c5e;
+        }
+        
+        .profile-subtitle {
+          margin: 8px 0 0;
+          font-size: 14px;
+          color: #666;
+        }
+        
+        .profile-content {
+          max-width: 1200px;
+          margin: 25px auto;
+          padding: 0 20px;
+          display: flex;
+          gap: 25px;
+        }
+        
+        .profile-sidebar {
+          width: 250px;
+          flex-shrink: 0;
           display: flex;
           flex-direction: column;
           align-items: center;
-          padding: 48px 24px 32px;
-          text-align: center;
         }
-
-        .pp-avatar-wrap {
+        
+        .sidebar-label {
+          font-size: 14px;
+          font-weight: 700;
+          color: #333;
+          margin-bottom: 12px;
+        }
+        
+        .avatar-circle {
           width: 150px;
           height: 150px;
           border-radius: 50%;
           overflow: hidden;
           cursor: pointer;
+          border: 4px solid #e8611a;
+          margin-bottom: 15px;
+          background: white;
           display: flex;
           align-items: center;
           justify-content: center;
-          background: linear-gradient(180deg, #f5a623, #f7c948);
         }
-
-        .pp-avatar-img {
+        
+        .avatar-img {
           width: 100%;
           height: 100%;
           object-fit: cover;
         }
-
-        .pp-upload-btn {
-          margin-top: 22px;
-          background: #fff5ee;
-          border: 1.5px solid #f5c88a;
+        
+        .avatar-upload-btn {
+          background: white;
+          border: 2px solid #e8611a;
           color: #e8611a;
-          font-size: 14px;
+          border-radius: 20px;
+          padding: 8px 20px;
+          font-size: 13px;
           font-weight: 600;
-          padding: 9px 22px;
-          border-radius: 24px;
           cursor: pointer;
-          transition: background 0.2s;
-          font-family: inherit;
+          margin-bottom: 10px;
         }
-
-        .pp-upload-btn:hover {
-          background: #ffe8d4;
+        
+        .avatar-upload-btn:hover {
+          background: #e8611a;
+          color: white;
         }
-
-        .pp-photo-label {
-          margin-top: 18px;
-          font-size: 14px;
-          font-weight: 600;
-          color: #333;
-        }
-
-        .pp-photo-hint {
-          margin-top: 6px;
-          font-size: 12px;
-          color: #999;
-          line-height: 1.5;
+        
+        .avatar-hint {
+          font-size: 11px;
+          color: #666;
+          text-align: center;
+          margin: 0 0 15px;
           max-width: 180px;
         }
-
-        .pp-form-area {
+        
+        .preview-box {
+          background: #f0f7ff;
+          border: 1px solid #c2e0ff;
+          border-radius: 8px;
+          padding: 12px;
+          width: 100%;
+        }
+        
+        .preview-box h4 {
+          margin: 0 0 8px;
+          font-size: 13px;
+          color: #1a3c5e;
+        }
+        
+        .preview-box p {
+          margin: 5px 0;
+          font-size: 11px;
+          color: #555;
+        }
+        
+        .profile-form-area {
           flex: 1;
-          padding: 40px 44px 44px;
         }
-
-        .pp-section-title {
-          margin: 0 0 28px;
-          font-size: 20px;
-          font-weight: 800;
-          color: #1a1a2e;
-          letter-spacing: 1px;
+        
+        .form-section-title {
+          margin: 0 0 20px;
+          font-size: 17px;
+          font-weight: 700;
+          color: #1a3c5e;
+          border-bottom: 2px solid #e8611a;
+          padding-bottom: 6px;
         }
-
-        .pp-row {
+        
+        .form-grid {
           display: flex;
-          gap: 22px;
-          margin-bottom: 24px;
-          align-items: flex-start;
+          flex-direction: column;
+          gap: 15px;
         }
-
-        .pp-row-3 .pp-group {
-          flex: 1;
+        
+        .form-row {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 15px;
         }
-
-        .pp-row-2 .pp-group {
-          flex: 1;
+        
+        .form-row-2col {
+          grid-template-columns: repeat(2, 1fr);
         }
-
-        .pp-group {
+        
+        .form-field {
           display: flex;
           flex-direction: column;
         }
-
-        .pp-group label {
-          font-size: 13.5px;
+        
+        .field-label {
+          font-size: 12px;
           font-weight: 600;
           color: #444;
-          margin-bottom: 7px;
+          margin-bottom: 6px;
         }
-
-        .pp-req {
-          color: #e8611a;
-        }
-
-        .pp-input {
-          border: 1.5px solid #dde3ec;
-          border-radius: 10px;
-          padding: 11px 14px;
-          font-size: 15px;
-          color: #222;
-          background: #fff;
+        
+        .field-input {
+          padding: 10px 12px;
+          border: 1.5px solid #ddd;
+          border-radius: 8px;
+          font-size: 13px;
           outline: none;
-          transition: border-color 0.2s;
-          font-family: inherit;
-          box-sizing: border-box;
-          width: 100%;
+          background: white;
         }
-
-        .pp-input:focus {
+        
+        .field-input:focus {
           border-color: #e8611a;
         }
-
-        .pp-input::placeholder {
-          color: #aab;
-        }
-
-        select.pp-input {
-          appearance: auto;
-          -webkit-appearance: auto;
-          cursor: pointer;
-        }
-
-        .pp-textarea {
+        
+        .field-textarea {
           resize: vertical;
-          min-height: 72px;
-          line-height: 1.5;
+          min-height: 50px;
         }
-
-        .pp-mobile-wrap {
+        
+        .gender-pills {
           display: flex;
-          border: 1.5px solid #dde3ec;
-          border-radius: 10px;
-          overflow: hidden;
-          background: #fff;
-          transition: border-color 0.2s;
+          gap: 6px;
         }
-
-        .pp-mobile-wrap:focus-within {
-          border-color: #e8611a;
-        }
-
-        .pp-mobile-prefix {
-          background: #f3f5f8;
-          border-right: 1px solid #dde3ec;
-          padding: 11px 12px;
-          font-size: 15px;
-          font-weight: 600;
-          color: #444;
-          display: flex;
-          align-items: center;
-        }
-
-        .pp-mobile-input {
-          border: none;
-          border-radius: 0;
+        
+        .gender-pill {
           flex: 1;
-          width: auto;
-        }
-
-        .pp-mobile-input:focus {
-          border-color: transparent;
-        }
-
-        .pp-gender-wrap {
-          display: flex;
-          flex-wrap: wrap;
-          gap: 8px;
-          padding-top: 2px;
-        }
-
-        .pp-gender-btn {
-          border: 1.5px solid #dde3ec;
-          background: #fff;
+          padding: 8px;
+          border: 1.5px solid #ddd;
+          border-radius: 8px;
+          background: white;
+          font-size: 12px;
+          font-weight: 500;
           color: #555;
-          font-size: 14px;
-          font-weight: 600;
-          padding: 8px 20px;
-          border-radius: 24px;
           cursor: pointer;
-          transition: all 0.2s;
-          font-family: inherit;
         }
-
-        .pp-gender-btn:hover {
+        
+        .gender-pill.active {
           border-color: #e8611a;
+          background: #fff5ed;
           color: #e8611a;
         }
-
-        .pp-gender-btn.active {
-          border-color: #e8611a;
-          color: #e8611a;
-          background: #fff5ee;
-        }
-
-        .pp-gender-btn:not(.active) {
-          color: #777;
-          background: #f8f9fa;
-        }
-
-        .pp-consent {
-          margin-top: 8px;
-          margin-bottom: 4px;
-          background: #fafbfc;
-          border: 1.5px solid #eef1f6;
-          border-radius: 12px;
-          padding: 16px 20px;
-        }
-
-        .pp-consent-label {
+        
+        .mobile-wrapper {
           display: flex;
           align-items: center;
-          gap: 14px;
-          cursor: pointer;
-          font-size: 14.5px;
-          color: #333;
-          line-height: 1.5;
+          border: 1.5px solid #ddd;
+          border-radius: 8px;
+          overflow: hidden;
+          background: white;
         }
-
-        .pp-consent-check {
-          width: 22px;
-          height: 22px;
+        
+        .mobile-prefix {
+          background: #f5f5f5;
+          padding: 10px 12px;
+          font-size: 13px;
+          color: #666;
+          border-right: 1.5px solid #ddd;
+        }
+        
+        .mobile-main {
+          border: none;
+          flex: 1;
+        }
+        
+        .consent-box {
+          background: #f7f9fc;
+          border-radius: 10px;
+          padding: 15px 18px;
+          margin-top: 20px;
+        }
+        
+        .consent-label {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          cursor: pointer;
+        }
+        
+        .consent-checkbox {
+          width: 18px;
+          height: 18px;
           accent-color: #e8611a;
-          flex-shrink: 0;
-          cursor: pointer;
         }
-
-        .pp-actions {
-          margin-top: 32px;
+        
+        .consent-text {
+          font-size: 13px;
+          color: #444;
+        }
+        
+        .save-btn-wrap {
+          margin-top: 25px;
           display: flex;
           justify-content: center;
         }
-
-        .pp-save-btn {
+        
+        .save-btn {
           background: #e8611a;
-          color: #fff;
+          color: white;
           border: none;
-          border-radius: 32px;
-          padding: 16px 80px;
-          font-size: 18px;
-          font-weight: 700;
+          border-radius: 25px;
+          padding: 14px 60px;
+          font-size: 16px;
+          font-weight: 600;
           cursor: pointer;
-          letter-spacing: 0.5px;
-          transition: background 0.2s, transform 0.15s;
-          font-family: inherit;
         }
-
-        .pp-save-btn:hover {
+        
+        .save-btn:hover {
           background: #d45515;
-          transform: translateY(-1px);
         }
-
-        .pp-save-btn:active {
-          transform: translateY(0);
+        
+        .info-box {
+          margin-top: 20px;
+          padding: 12px 15px;
+          background: #edf7ff;
+          border: 1px solid #c2e0ff;
+          border-radius: 8px;
+          font-size: 12px;
+          color: #1a3c5e;
         }
-
-        .pp-save-btn:disabled {
-          background: #f0b088;
-          cursor: not-allowed;
-          transform: none;
+        
+        .info-box h4 {
+          margin: 0 0 6px;
+          font-size: 13px;
         }
-
-        @media (max-width: 900px) {
-          .pp-card {
+        
+        .info-box p {
+          margin: 4px 0;
+        }
+        
+        @media (max-width: 768px) {
+          .profile-content {
             flex-direction: column;
-            width: calc(100% - 32px);
           }
-          .pp-sidebar {
+          
+          .profile-sidebar {
             width: 100%;
-            min-width: unset;
-            border-right: none;
-            border-bottom: 1px solid #eee;
-            padding: 32px 20px;
+            max-width: 300px;
+            margin: 0 auto;
           }
-          .pp-form-area {
-            padding: 28px 24px 36px;
+          
+          .form-row {
+            grid-template-columns: 1fr;
           }
-          .pp-row {
-            flex-direction: column;
-            gap: 18px;
+          
+          .form-row-2col {
+            grid-template-columns: 1fr;
           }
-        }
-
-        @keyframes spin {
-          0% { transform: rotate(0deg); }
-          100% { transform: rotate(360deg); }
         }
       `}</style>
     </div>
